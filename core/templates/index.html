@@ -1,0 +1,135 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="{% static 'css/normalize.css' %}">
+    <link rel="stylesheet" href="{% static 'js/bootstrap-4.4.1-dist/css/bootstrap.min.css' %}">
+</head>
+<body>
+    {% if user.is_anonymous %}
+        <a href="{% url 'login' %}">Logar</a>
+        <a href="{% url 'cadastro' %}">Cadastrar</a>
+    {% else %}
+        {% if user.is_staff %}
+            <a href="{% url 'logout' %}">Logout</a>
+        {% else %}
+            <div class="row header fixed-top">
+                <div class="col-6">
+                    <h1>Dq</h1>
+                </div>
+                <div class="col-6">
+                    <nav class="navbar navbar-expand-lg navbar-light">
+                        <button type="button" class="navbar-toggler" data-target="#menuMovel" data-toggle="collapse">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="collapse navbar-collapse" id="menuMovel">
+                            <ul class="navbar-nav">
+                                <li class="nav-item">
+                                    <a href="{% url 'index' %}" class="nav-link">Cardápio</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{% url 'pedidos' %}" class="nav-link">Meus pedidos</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{% url 'taxas' %}" class="nav-link">Taxa</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="#" class="nav-link">Contato</a>
+                                </li>
+                                {% if carrinho %}
+                                    <li class="nav-item">
+                                        <a href="#" data-toggle="modal" data-target="#modal_carrinho" class="nav-link">Carrinho</a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+            <div class="container-fluid" style="padding-top:70px;">
+                {% if carrinho %}
+                    {% for i in carrinho %}
+                        <a href="{% url 'finalizar' i.cod_pedido.cod_compra %}" type="button">Finalizar pedido {{i.cod_pedido.cod_compra}}</a>
+                    {% endfor %}
+                {% endif %}
+                <a href="{% url 'logout' %}">Logout</a>
+                {% for p in primario %}
+
+                    <h4 class="{{p}}">{{p}}</h4>
+                    <center>
+                        <div class="row">
+                            {% for i in produtos %}
+                                {% if i.cod_primario.nome == p.nome %}
+                                    <div class="modal fade" id="modal{{i.cod_ing}}" data-toggle="modal">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <form method="post" action="">
+                                                    {% csrf_token %}
+                                                    <div class="modal-header">
+                                                        <input class="modal-title" placeholder="{{i.nome}}" value="{{i.nome}}" id="nome" name="nome" type="text" style="width:600px;">
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="col-12">
+                                                            {{i.ingredientes}}
+                                                        </div>
+                                                        <div class="col-4">
+                                                            {{i.descricao}}
+                                                        </div>
+                                                        <div class="col-4">
+                                                            <p>R$: {{i.valor}}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="submit">Confimar</button>
+                                                        <input type="number" id="quantidade" name="quantidade">
+                                                        <button>Sair</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-4" data-target="#modal{{i.cod_ing}}" data-toggle="modal">
+                                        <img src="{{i.imagem.url}}" alt="Eoq" width="50%">
+                                        <p>{{i.nome}}</p>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </center>
+                {% endfor %}
+            </div>
+            {% if carrinho %}
+                {% for i in carrinho %}
+                    <div class="modal fade" data-toggle="modal" id="modal_carrinho">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h6 class="modal-title">{{i.cod_pedido.cod_compra}}</h6>
+                                </div>
+                                <div class="modal-body">
+                                    {% for j in prod %}
+                                        <p>{{j.1}}</p>
+                                        <p>{{j.2}}</p>
+                                        <p>{{j}}</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            <div class="footer fixed-bottom">
+                <center>
+                    Contato aqui
+                </center>
+            </div>
+        {% endif %}
+    {% endif %}
+    <script src="static/js/jquery.js"></script>
+    <script src="static/js/funcoes_js.js"></script>
+    <script src="static/js/bootstrap-4.4.1-dist/js/bootstrap.min.js"></script>
+</body>
+</html>

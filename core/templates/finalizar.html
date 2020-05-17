@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <h3>Carrinho</h3>
+    <form method="post" action="">
+        {% csrf_token %}
+        {% for i in carrinho %}
+            <p>{{i.cod_pedido.cod_compra}}</p>
+            <p>{{i.cod_prod.nome}} X{{i.quantidade}}</p>
+            <a href="{% url 'finalizar' i.cod_prod.cod_ing%}">Remover {{i.cod_prod.cod_ing}}</a>
+        {% endfor %}
+    </form>
+    <form method="post" action="">
+        {% csrf_token %}
+        {% for i in forma %}
+            <label for="forma">{{i.forma}}</label>
+            <input type="radio" id="forma" name="forma" value="{{i.forma}}">
+            <button type="submit">Finalizar</button>
+        {% endfor %}
+    </form>
+</body>
+</html>
