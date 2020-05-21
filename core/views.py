@@ -8,6 +8,7 @@ from django.db.models import Sum
 # Create your views here.
 
 def index(request):
+    '''
     with connection.cursor() as cursor:
         pedidos = Pedido.objects.filter(cod_cliente=request.user.id, finalizado=False)
         pri = Primario.objects.all()
@@ -48,6 +49,7 @@ def index(request):
                 'SELECT COD_COMPRA, NOME, TOTAL FROM CORE_PRODUTOPEDIDO INNER JOIN CORE_PRODUTO ON COD_PROD_ID = COD_ING INNER JOIN CORE_PEDIDO ON COD_PEDIDO_ID = COD_COMPRA INNER JOIN CORE_USUARIO ON COD_CLIENTE_ID = ID WHERE CORE_USUARIO.ID = %s AND FINALIZADO = %s',
                 (request.user.id, False))
             linha = cursor.fetchall()
+    '''
     return render(request, 'index.html', {'primario':pri, 'produtos':produtos, 'pedidos':pedidos, 'carrinho':carrinho, 'prod':linha})
 
 def cadastro(request):
