@@ -1,0 +1,46 @@
+.nome-alimento{
+    border-top: solid 2px green;
+    padding-top: 1%;
+}
+
+.header{
+    background-color: orange;
+}
+html {
+    position: relative;
+    min-height: 100%;
+}
+.container-fluid{
+    background-color: #f1f1f1;
+    padding-top: 5%;
+    padding-bottom: 5%;
+    min-height: 100%;
+}
+
+.footer{
+    background-color: orange;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+}
+
+.produto{
+    padding-top: 3%;
+}
+.produto:hover{
+    background-color: cadetblue;
+    cursor: pointer;
+}
+
+ul li a:hover{
+    background-color: oldlace;
+}
+
+#quantidade{
+    width: 10%;
+}
+
+#nome{
+    border: 0px;
+}
+
