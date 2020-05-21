@@ -1,12 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-    {% for i in taxas %}
-        {{i.nome}}, {{i.taxa}}
-    {% endfor %}
-</body>
-</html>
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <div class="container-fluid">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Bairro</th>
+                    <th>Valor</th>
+                </tr>
+            </thead>
+            {% for i in taxas %}
+            <tbody>
+                <td>{{i.nome}}</td>
+                <td>{{i.taxa}}</td>
+            </tbody>
+            {% endfor %}    
+            
+        </table>
+    </div>
+{% endblock %}

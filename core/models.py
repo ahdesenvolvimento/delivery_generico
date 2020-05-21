@@ -97,8 +97,14 @@ class FormaPagamento(models.Model):
         return self.forma
 
 class Pedido(Base):
+    UNITY_CHOICES = (
+        ('Aguardando confirmação', 'Aguardando confirmação'),
+        ('Pedido em produção', 'Pedido em produção'),
+        ('Saiu para entrega', 'Saiu para entrega'),
+        ('Entregue', 'Entregue'),
+    )
     cod_compra = models.AutoField('Código do pedido', primary_key=True)
-    status = models.CharField('Status do pedido', max_length=70, default='Aguardando confirmação')
+    status = models.CharField('Status do pedido', max_length=70, choices=UNITY_CHOICES, default='Não finalizado')
     cod_cliente = models.ForeignKey(Usuario, on_delete=models.CASCADE)
     controle = models.BooleanField('Controle', default=False)
     finalizado = models.BooleanField('Pedido Finalizado?', default=False)

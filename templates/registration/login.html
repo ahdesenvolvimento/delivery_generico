@@ -1,15 +1,32 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Login</title>
+    <link rel="stylesheet" href="{% static 'css/normalize.css' %}">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    <link rel="stylesheet" href="{% static 'js/bootstrap-4.4.1-dist/css/bootstrap.min.css' %}">
 </head>
 <body>
-    <form method="post" action="">
-        {% csrf_token %}
-        <input type="text" id="username" name="username" placeholder="Email">
-        <input type="password" id="password" name="password" placeholder="senhae">
-        <button type="submit">Logar</button>
-    </form>
+    <center>
+        <h1>NOME DA EMPRESA</h1>
+        <div class="container-fluid">
+            <form method="post" action="">
+                {% csrf_token %}
+                <div class="form-group">
+                    <input type="text" id="username" name="username" placeholder="Usuário">
+                </div>
+                <div class="form-group">
+                    <input type="password" id="password" name="password" placeholder="Senha">
+                </div>
+                <button class="btn btn-primary" type="submit">Entrar</button>
+            </form>
+            <a class="btn btn-primary" href="{% url 'cadastro' %}">Não possuo cadastro</a>
+        </div>
+    </center>   
+    <script src="../../static/js/jquery.js"></script>
+    <script src="../../static/js/funcoes_js.js"></script>
+    <script src="../../static/js/bootstrap-4.4.1-dist/js/bootstrap.min.js"></script>
 </body>
 </html>

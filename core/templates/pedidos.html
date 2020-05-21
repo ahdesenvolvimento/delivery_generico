@@ -1,97 +1,44 @@
+{% extends 'base.html' %}
 {% load static %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    <link rel="stylesheet" href="{% static 'css/normalize.css' %}">
-    <link rel="stylesheet" href="{% static 'js/bootstrap-4.4.1-dist/css/bootstrap.min.css' %}">
-</head>
-<body>
-    {% if user.is_anonymous %}
-        <a href="{% url 'login' %}">Logar</a>
-        <a href="{% url 'cadastro' %}">Cadastrar</a>
-    {% else %}
-        {% if user.is_staff %}
-            <a href="{% url 'logout' %}">Logout</a>
-        {% else %}
-            <div class="row header fixed-top">
-                <div class="col-6">
-                    <h1>Dq</h1>
-                </div>
-                <div class="col-6">
-                    <nav class="navbar navbar-expand-lg navbar-light">
-                        <button type="button" class="navbar-toggler" data-target="#menuMovel" data-toggle="collapse">
-                            <span class="navbar-toggler-icon"></span>
-                        </button>
-                        <div class="collapse navbar-collapse" id="menuMovel">
-                            <ul class="navbar-nav">
-                                <li class="nav-item">
-                                    <a href="{% url 'index' %}" class="nav-link">Cardápio</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{% url 'pedidos' %}" class="nav-link">Meus pedidos</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link">Taxa</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link">Contato</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </nav>
-                </div>
-            </div>
-            <div class="container-fluid" style="padding-top:70px;">
-                <center>
-                    {% for p in pedidos %}
-                        <div class="row">
-                            <div class="col-12" style="border: solid 2px red;" data-target="#modal_pedidos{{p.cod_compra}}" data-toggle="modal">
-                                <p>Numero do pedido: {{p.cod_compra}}</p>
-                                <p>Status: {{p.status}}</p>
-                                {% for i in total %}
-                                    {% if i.0 == p.cod_compra %}
-                                        <p>Total: {{i.1}}</p>
-                                    {% endif %}
-                                {% endfor %}
-                                <div class="modal fade" data-toggle="modal" id="modal_pedidos{{p.cod_compra}}">
-                                    <div class="modal-dialog" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h6 class="modal-title">{{p.cod_compra}}</h6>
+{% block content %}
+    <div class="container-fluid">
+        <center>
+            {% for p in pedidos %}
+                <div class="row">
+                    <div class="col-12" style="border: solid 2px red;" data-target="#modal_pedidos{{p.cod_compra}}" data-toggle="modal">
+                        <p>Numero do pedido: {{p.cod_compra}}</p>
+                        <p>Status: {{p.status}}</p>
+                        <p>{{p.criacao}}</p>
+                        {% for i in total %}
+                            {% if i.0 == p.cod_compra %}
+                                <p>Total: {{i.1}}</p>
+                            {% endif %}
+                        {% endfor %}
+                        <div class="modal fade" data-toggle="modal" id="modal_pedidos{{p.cod_compra}}">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h6 class="modal-title">{{p.cod_compra}}</h6>
+                                    </div>
+                                    <div class="modal-body">
+                                        {% for prod in produtos %}
+                                            <div class="col-6">
+                                                {% if prod.cod_pedido.cod_compra == p.cod_compra %}
+                                                    {{prod.cod_prod.nome}}
+                                                {% endif %}
                                             </div>
-                                            <div class="modal-body">
-                                                {% for prod in produtos %}
-                                                    <div class="col-6">
-                                                        {% if prod.cod_pedido.cod_compra == p.cod_compra %}
-                                                            {{prod.cod_prod.nome}}
-                                                        {% endif %}
-                                                    </div>
-                                                {% endfor %}
-                                            </div>
-                                            <div class="modal-footer">
+                                        {% endfor %}
+                                    </div>
+                                    <div class="modal-footer">
 
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    {% endfor %}
-                 </center>
-            </div>
-
-            <div class="footer fixed-bottom">
-                <center>
-                    Contato aqui
-                </center>
-            </div>
-        {% endif %}
-    {% endif %}
-    <script src="static/js/jquery.js"></script>
-    <script src="static/js/funcoes_js.js"></script>
-    <script src="static/js/bootstrap-4.4.1-dist/js/bootstrap.min.js"></script>
-</body>
-</html>
+                    </div>
+                </div>
+            {% endfor %}
+            </center>
+    </div>
+{% endblock %}
