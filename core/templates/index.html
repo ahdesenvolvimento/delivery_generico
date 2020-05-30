@@ -2,80 +2,100 @@
 {% load static %}
 
 {% block content %}
-    <div class="container-fluid index">
-        <p>Bem vindo <strong>{{user.username}}</strong>, fique a vontade para escolher seu pedido</p>
-        {% if carrinho %}
-            {% for i in pedidos %}
-                <a class="btn btn-primary" href="{% url 'finalizar' i.cod_compra %}" type="button">Finalizar pedido {{i.cod_pedido.cod_compra}}</a>
-            {% endfor %}
-        {% endif %}
-        {% for p in primario %}
+    {% if request.user.is_staff %}
+         <div class="container-fluid index">
+            <h6>Bem vindo a administração do sistema</h6>
 
-            <h4 class="nome-alimento">{{p}}</h4>
-            <center>
-                <div class="row">
-                    {% for i in produtos %}
-                        {% if i.cod_primario.nome == p.nome %}
-                            <div class="modal fade" id="modal{{i.cod_ing}}" data-toggle="modal">
-                                <div class="modal-dialog" role="document">
-                                    <div class="modal-content">
-                                        <form method="post" action="">
-                                            {% csrf_token %}
-                                            <div class="modal-header">
-                                                <input class="modal-title" placeholder="{{i.nome}}" value="{{i.nome}}" id="nome" name="nome" type="text" style="width:600px;">
-                                            </div>
-                                            <div class="modal-body">
-                                                <div class="col-12">
-                                                    <img src="{{i.imagem.url}}" alt="" width="50%">
+             {% for i in pedidos %}
+                 <form method="POST" action="">
+                     {% csrf_token %}
+                        <label for>Cliente: {{i.cod_endereco.cod_cliente.username}}</label>
+                        <input type="number" id="cod_pedido" name="cod_pedido" value="{{i.cod_pedido}}">
+                        <select id="status" name="status">
+                            <option value="Pedido em produção">{{i.status}}</option>
+                            <option value="Pedido saiu para entrega">Pedido saiu para entrega</option>
+                            <option value="Entregue">Entregue</option>
+                        </select>
+                             <button type="submit">Salvar</button>
+                     {% for j in produtos %}
+                        {% if i.cod_pedido == j.cod_pedido.cod_pedido %}
+                            <p>Itens pedido {{i.cod_pedido}}: {{j.cod_prod.nome}}</p>
+                        {% endif %}
+                     {% endfor %}
+                     </form>
+                <p>Valor total: R$ {{i.total}}</p>
+             {% endfor %}
+         </div>
+    {% else %}
+        <div class="container-fluid index">
+            <h6>Bem vindo <strong>{{user.username}}</strong>, fique a vontade para escolher seu pedido</h6>
+            {% if carrinho %}
+                <a class="btn btn-primary" href="{% url 'finalizar' %}" type="button">Finalizar pedido</a>
+            {% endif %}
+            {% for tip in tipo %}
+                <h4 class="nome-alimento">{{tip}}</h4>
+                <center>
+                    <div class="row">
+                        {% for i in produtos %}
+                            {% if i.cod_tipo.tipo == tip.tipo %}
+                                <div class="modal fade" id="modal{{i.cod_prod}}" data-toggle="modal">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <form method="post" action="">
+                                                {% csrf_token %}
+                                                <div class="modal-header">
+                                                    <input class="modal-title" placeholder="{{i.nome}}" value="{{i.nome}}" id="nome" name="nome" type="text" style="width:600px;">
                                                 </div>
-                                                <div class="col-6">
-                                                    {{i.ingredientes}}                                                   
+                                                <div class="modal-body">
+                                                    <div class="col-12">
+                                                        <img src="{{i.imagem.url}}" alt="" width="50%">
+                                                    </div>
+                                                    <div class="col-6">
+                                                        {{i.ingredientes}}
+                                                    </div>
+                                                    <div class="col-6">
+                                                        {{i.descricao}}
+                                                    </div>
                                                 </div>
-                                                <div class="col-6">
-                                                    {{i.descricao}}
+                                                <div class="modal-footer">
+                                                    {% if request.user.is_anonymous %}
+                                                        <small>Você precisa está logado para adicionar o item ao carrinho</small>
+                                                        <a class="btn btn-secondary" href="{% url 'login' %}">Logar</a>
+                                                    {% else %}
+                                                        <input type="number" id="quantidade" name="quantidade" value="1">
+                                                        <button class="btn btn-secondary" type="submit">Adicionar +R$ {{i.valor}}</button>
+                                                    {% endif %}
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Sair</button>
                                                 </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                {% if request.user.is_anonymous %}
-                                                    <small>Você precisa está logado para adicionar o item ao carrinho</small>
-                                                    <a class="btn btn-secondary" href="{% url 'login' %}">Logar</a>
-                                                {% else %}
-                                                    <input type="number" id="quantidade" name="quantidade" value="1">
-                                                    <button class="btn btn-secondary" type="submit">Adicionar +R$ {{i.valor}}</button>
-                                                {% endif %}
-                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Sair</button>
-                                            </div>
-                                        </form>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-4 produto" data-target="#modal{{i.cod_ing}}" data-toggle="modal">
-                                <img src="{{i.imagem.url}}" alt="" width="50%">
-                                <p>{{i.nome}}</p>
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-            </center>
-        {% endfor %}
-    </div>
-    {% if carrinho %}
-        {% for i in carrinho %}
+                                <div class="col-4 produto" data-target="#modal{{i.cod_prod}}" data-toggle="modal">
+                                    <img src="{{i.imagem.url}}" alt="" width="50%">
+                                    <p>{{i}}</p>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </center>
+            {% endfor %}
+        </div>
+        {% if carrinho %}
             <div class="modal fade" data-toggle="modal" id="modal_carrinho">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h6 class="modal-title">{{i.cod_pedido.cod_compra}}</h6>
+                            <h6 class="modal-title">Carrinho</h6>
                             <button type="button" class="close" data-dismiss="modal">&times;</button>
                         </div>
                         <div class="modal-body">
-                            {% for j in prod %}
+                            {% for i in carrinho %}
                                 <div class="col-12">
-                                    <p>{{j.1}}</p>
+                                    <p>{{i.cod_prod}} x{{i.quantidade}} = R$ {{i.total}}</p>
                                 </div>
                                 <div class="col-12">
-                                    <p>{{j.2}}</p>
-                                    {{j}}
+                                    <p></p>
                                 </div>
                             {% endfor %}
                         </div>
@@ -85,6 +105,6 @@
                     </div>
                 </div>
             </div>
-        {% endfor %}
+        {% endif %}
     {% endif %}
  {% endblock %}

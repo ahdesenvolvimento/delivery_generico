@@ -21,8 +21,8 @@ class UsuarioTestCase(TestCase):
 
 class PrimarioTest(TestCase):
     def setUp(self):
-        print("Iniciando Primario Tests")
-        self.primario = mommy.make('Primario')
+        print("Iniciando Tipo Tests")
+        self.primario = mommy.make('Tipo')
     def test_str(self):
         self.assertEquals(str(self.primario), self.primario.nome)
 

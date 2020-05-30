@@ -6,29 +6,26 @@
         <center>
             {% for p in pedidos %}
                 <div class="row">
-                    <div class="col-12" style="border: solid 2px red;" data-target="#modal_pedidos{{p.cod_compra}}" data-toggle="modal">
-                        <p>Numero do pedido: {{p.cod_compra}}</p>
+                    <div class="col-12" style="border: solid 2px red;" data-target="#modal_pedidos{{p.cod_pedido}}" data-toggle="modal">
+                        <p>Numero do pedido: {{p.cod_pedido}}</p>
                         <p>Status: {{p.status}}</p>
                         <p>{{p.criacao}}</p>
-                        {% for i in total %}
-                            {% if i.0 == p.cod_compra %}
-                                <p>Total: {{i.1}}</p>
-                            {% endif %}
-                        {% endfor %}
-                        <div class="modal fade" data-toggle="modal" id="modal_pedidos{{p.cod_compra}}">
+                        <p>Valor do pedido: R$ {{p.total}}</p>
+                        <div class="modal fade" data-toggle="modal" id="modal_pedidos{{p.cod_pedido}}">
                             <div class="modal-dialog" role="document">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h6 class="modal-title">{{p.cod_compra}}</h6>
+                                        <h6 class="modal-title">{{p.cod_pedido}}</h6>
                                     </div>
                                     <div class="modal-body">
-                                        {% for prod in produtos %}
-                                            <div class="col-6">
-                                                {% if prod.cod_pedido.cod_compra == p.cod_compra %}
-                                                    {{prod.cod_prod.nome}}
-                                                {% endif %}
-                                            </div>
+                                        {% for i in produtos %}
+                                            {% if p.cod_pedido == i.cod_pedido.cod_pedido %}
+                                                <div class="col-6">
+                                                    <p>{{i.cod_prod.nome}}</p>
+                                                </div>
+                                            {% endif %}
                                         {% endfor %}
+
                                     </div>
                                     <div class="modal-footer">
 

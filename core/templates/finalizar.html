@@ -12,7 +12,7 @@
                 {% endfor %}
                 {% for i in carrinho %}
                     <p>{{i.cod_prod.nome}} x{{i.quantidade}}</p>
-                    <a href="{% url 'finalizar' i.cod_prod.cod_ing%}">Remover</a>
+                    <a href="{% url 'deletar' i.cod_prod.cod_prod %}">Remover</a>
                 {% endfor %}
             </form>
             <div class="row col-12">
@@ -21,15 +21,56 @@
                     {% for i in forma %}
                     <div class="form-row">
                         <div class="form-group col-12">
-                            <label for="forma">{{i.forma}}</label>
-                            <input type="radio" id="forma" name="forma" value="{{i.forma}}">
+                            <label for="pk_forma">{{i.forma}}</label>
+                            <input type="radio" id="pk_forma" name="pk_forma" value="{{i.cod_forma}}">
                         </div>
                     </div>
                     {% endfor %}
+                    {% for i in enderecos %}
+                        <div class="col-12">
+                            <label for="pk">{{i.numero}}{{i.bairro}}</label>
+                            <input type="radio" id="pk" name="pk" value="{{i.numero}}">
+                        </div>
+                    {% endfor %}
                     <button type="submit">Finalizar</button>
                 </form>
+            </div>
+            <div class="row col-12">
+                <h6>Endereços salvos</h6>
+                {% if enderecos %}
+                    <form method="POST" action="">
+                        {% csrf_token %}
+
+                        <button type="submit">Pronto</button>
+                    </form>
+
+                    <button data-toggle="modal" data-target="#modal_endereco">Adicionar endereço</button>
+                {% else %}
+                    <p>Sem endereços salvos</p>
+                    <button data-toggle="modal" data-target="#modal_endereco">Adicionar endereço</button>
+                {% endif %}
+                <div class="modal fade" id="modal_endereco">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h6 class="modal-title">Opa</h6>
+                            </div>
+                            <form action="" method="POST">
+                                {% csrf_token %}
+                                <div class="modal-body">
+                                    {{form.as_p}}
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="submit">Salvar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
 {% endblock %}
+

@@ -1,19 +1,24 @@
 from django.shortcuts import render, redirect, get_object_or_404
 #from .models import Usuarios
-from .models import Primario, Produto, Pedido, ProdutoPedido, FormaPagamento, Bairro, Usuario
-from .forms import UserModelForm, PedidoModelForm, PagamentoModelForm, ProdutoPedidoModelForm
+from .models import Tipo, Produto, Pedido, Carrinho, FormaPagamento, Bairro, Usuario, EnderecoCliente, Endereco
+from .forms import UserModelForm, ProdutoModelForm,\
+    PagamentoModelForm, QuantidadeModelForm, AtualizaPedido,\
+    ProdutoForm, TipoProdutos, FormaPagamentoModel, TaxasModel, \
+    EnderecoModel, EnderecoClienteModel
+
 from django.db import connection
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Sum
 # Create your views here.
 
 def index(request):
+    '''
     with connection.cursor() as cursor:
         pedidos = Pedido.objects.filter(cod_cliente=request.user.id, finalizado=False)
-        pri = Primario.objects.all()
+        pri = Tipo.objects.all()
         produtos = Produto.objects.all()
         form = PedidoModelForm(request.POST)
-        form2 = ProdutoPedidoModelForm(request.POST)
+        form2 = QuantidadeModelForm(request.POST)
         if form.is_valid() and form2.is_valid():
             dados = form.cleaned_data
             quant = form2.cleaned_data
@@ -21,7 +26,7 @@ def index(request):
             prod = prod.first()
             try:
                 ped = Pedido.objects.get(cod_cliente=request.user.id, controle=True, finalizado=False)
-                y = ProdutoPedido.objects.filter(cod_pedido=ped.cod_compra, cod_pedido__cod_cliente=request.user.id, cod_prod__nome=dados['nome'])
+                y = Carrinho.objects.filter(cod_pedido=ped.cod_compra, cod_pedido__cod_cliente=request.user.id, cod_prod__nome=dados['nome'])
                 if y:
                     cursor.execute('SELECT NOME, QUANTIDADE, VALOR FROM CORE_PRODUTOPEDIDO INNER JOIN CORE_PRODUTO ON COD_PROD_ID = COD_ING INNER JOIN CORE_PEDIDO ON COD_PEDIDO_ID = COD_COMPRA INNER JOIN CORE_USUARIO ON COD_CLIENTE_ID = ID WHERE CORE_USUARIO.ID = %s AND FINALIZADO = %s AND COD_PEDIDO_ID = %s AND NOME = %s',(request.user.id, False, ped.cod_compra, dados['nome']))
                     linhas = cursor.fetchall()
@@ -29,7 +34,7 @@ def index(request):
                     quantidade = linhas[0][1] + quant['quantidade']
                     total = quantidade * linhas[0][2]
 
-                    ped = ProdutoPedido.objects.filter(cod_pedido=ped.cod_compra, cod_pedido__cod_cliente=request.user.id, cod_prod__nome=dados['nome']).update(quantidade=quantidade, total=total)
+                    ped = Carrinho.objects.filter(cod_pedido=ped.cod_compra, cod_pedido__cod_cliente=request.user.id, cod_prod__nome=dados['nome']).update(quantidade=quantidade, total=total)
                 else:
                     cursor.execute('INSERT INTO CORE_PRODUTOPEDIDO (COD_PEDIDO_ID, COD_PROD_ID, QUANTIDADE) VALUES (%s, %s, %s)', (ped.cod_compra, prod.cod_ing, quant['quantidade']))
             
@@ -41,14 +46,105 @@ def index(request):
                 with connection.cursor() as cursor:
                     cursor.execute('INSERT INTO CORE_PRODUTOPEDIDO (COD_PEDIDO_ID, COD_PROD_ID, QUANTIDADE, TOTAL) VALUES (%s, %s, %s, %s)', (pedido.cod_compra, prod.cod_ing, quant['quantidade'], total))
 
-        carrinho = ProdutoPedido.objects.filter(cod_pedido__finalizado=False,
-                                                cod_pedido__cod_cliente=request.user.id)
+        carrinho = Carrinho.objects.filter(cod_pedido__finalizado=False,
+                                           cod_pedido__cod_cliente=request.user.id)
         with connection.cursor() as cursor:
             cursor.execute(
                 'SELECT COD_COMPRA, NOME, TOTAL FROM CORE_PRODUTOPEDIDO INNER JOIN CORE_PRODUTO ON COD_PROD_ID = COD_ING INNER JOIN CORE_PEDIDO ON COD_PEDIDO_ID = COD_COMPRA INNER JOIN CORE_USUARIO ON COD_CLIENTE_ID = ID WHERE CORE_USUARIO.ID = %s AND FINALIZADO = %s',
                 (request.user.id, False))
             linha = cursor.fetchall()
     return render(request, 'index.html', {'primario':pri, 'produtos':produtos, 'pedidos':pedidos, 'carrinho':carrinho, 'prod':linha})
+    '''
+    #if request.user.is_authenticated:
+    if request.user.is_staff:
+        pedidos = Pedido.objects.all().order_by('-cod_pedido')
+        produtos = Carrinho.objects.all()
+       # with connection.cursor() as cursor:
+         #   cursor.execute(
+           #     'SELECT USERNAME, COD_PEDIDO, STATUS, NOME FROM CORE_PEDIDO INNER JOIN CORE_BASEPEDIDO ON COD_CARRINHO_ID = COD_BASE INNER JOIN CORE_CARRINHO ON COD_PSEUDO_PEDIDO_ID = COD_BASE INNER JOIN CORE_PRODUTO ON COD_PROD_ID = COD_PROD INNER JOIN CORE_USUARIO ON COD_CLIENTE_ID = ID'
+          #  )
+          #  pedidos = cursor.fetchall()
+       # print(pedidos[0])
+
+        form = AtualizaPedido(request.POST or None)
+
+        if form.is_valid():# and form2.is_valid():
+            print(form.cleaned_data)
+            #print(form2.cleaned_data)
+            pedido = Pedido.objects.filter(cod_pedido=request.POST.get('cod_pedido')).update(status=form.cleaned_data['status'])
+            print(request.POST.get("cod_pseudo_pedido"))
+            print('ops')
+        else:
+            print('haha')
+        return render(request, 'index.html', {'pedidos':pedidos,
+                                              'produtos':produtos})
+
+    else:
+        if str(request.method == 'POST'):
+            tipo = Tipo.objects.all()
+            produtos = Produto.objects.all()
+            print('começo')
+            form_produto = ProdutoModelForm(request.POST)
+            form_quantidade = QuantidadeModelForm(request.POST)
+            if form_produto.is_valid() and form_quantidade.is_valid():
+                print('formulario')
+                dados_prod = form_produto.cleaned_data
+                dados_quantidade = form_quantidade.cleaned_data
+                prod = Produto.objects.get(nome=dados_prod['nome'])
+                try:
+                    print('try')
+                    carro = Carrinho.objects.get(cod_cliente=request.user.id,
+                                                 cod_pedido=None,
+                                                 cod_cliente__controle_pedido=True,
+                                                 cod_prod__nome=dados_prod['nome'])
+                    print(carro)
+                    #existe = Carrinho.objects.filter(cod_pseudo_pedido=variavel.cod_base,
+                    #                                 cod_pseudo_pedido__cod_cliente=request.user.id,
+                    #
+                    #                                 cod_prod__nome=dados_prod['nome'])
+
+                    with connection.cursor() as cursor:
+                        cursor.execute(
+                            'SELECT NOME, QUANTIDADE, VALOR FROM CORE_PRODUTO P INNER JOIN CORE_CARRINHO C ON P.COD_PROD = C.COD_PROD_ID INNER JOIN CORE_USUARIO U ON COD_CLIENTE_ID = U.ID WHERE U.ID = %s AND CONTROLE_PEDIDO = %s AND NOME = %s',
+                            (request.user.id, True, dados_prod['nome']))
+                        linhas = cursor.fetchall()
+                    quantidade = linhas[0][1] + dados_quantidade['quantidade']
+                    total = quantidade * linhas[0][2]
+                    atualiza_carrinho = Carrinho.objects.filter(cod_pedido=None,
+                                                                cod_cliente=request.user.id,
+                                                                cod_cliente__controle_pedido=True,
+                                                                cod_prod__nome=dados_prod['nome']).update(quantidade=quantidade,
+                                                                                                          total=total)
+
+                    #else:
+                      #  inserir = Carrinho.objects.create(cod_pseudo_pedido=variavel,
+                         #                                 cod_prod=prod,
+                           #                               quantidade=dados_quantidade['quantidade'],
+                            #                              total=prod.valor * dados_quantidade['quantidade'])
+
+                except ObjectDoesNotExist:
+                    print('entrei aqui except')
+                   # base = BasePedido.objects.create(cod_cliente=request.user,
+                    #                                 controle=True)
+                   # base.save()
+                    total = prod.valor * dados_quantidade['quantidade']
+                    print('aqui carrinho')
+                    carrinho = Carrinho.objects.create(cod_prod=prod,
+                                                       quantidade=dados_quantidade['quantidade'],
+                                                       cod_cliente=request.user,
+                                                       total=total)
+                    usuario = Usuario.objects.filter(id=request.user.id).update(controle_pedido=True)
+                    carrinho.save()
+
+            carrinho = Carrinho.objects.filter(cod_cliente=request.user.id,
+                                               cod_pedido=None)
+            print(carrinho)
+            return render(request,
+                          'index.html',
+                          {'tipo':tipo,
+                           'produtos':produtos,
+                           'carrinho':carrinho})
+                          # 'base':variavel})
 
 def cadastro(request):
     form = UserModelForm(request.POST or None)
@@ -60,41 +156,155 @@ def cadastro(request):
     return render(request, 'cadastro.html', {'bairro':bairros})
 
 def pedidos(request):
-    pedidos = Pedido.objects.filter(cod_cliente=request.user.id).order_by('-cod_compra')
-    produtos = ProdutoPedido.objects.filter(cod_pedido__cod_cliente=request.user.id)
-    bairro = Usuario.objects.get(id=request.user.id)
-    taxa = Bairro.objects.get(nome=bairro.bairro)
-    with connection.cursor() as cursor:
-        cursor.execute(
-            'SELECT COD_COMPRA, SUM(TOTAL)+%s FROM CORE_PRODUTOPEDIDO INNER JOIN CORE_PRODUTO ON COD_PROD_ID = COD_ING INNER JOIN CORE_PEDIDO ON COD_PEDIDO_ID = COD_COMPRA INNER JOIN CORE_USUARIO ON COD_CLIENTE_ID = ID WHERE CORE_USUARIO.ID = %s GROUP BY COD_COMPRA ORDER BY COD_COMPRA DESC',
-            (taxa.taxa,
-             request.user.id,))
-        total = cursor.fetchall()
-    return render(request, 'pedidos.html', {'pedidos':pedidos, 'produtos':produtos, 'total':total})
+    pedidos = Pedido.objects.filter(cod_endereco__cod_cliente=request.user.id).order_by('-cod_pedido')
+    produtos = Carrinho.objects.filter(cod_cliente=request.user.id)
+    #print(produtos)
+    #produtos = Carrinho.objects.filter(cod_pedido__cod_cliente=request.user.id)
+    #bairro = Usuario.objects.get(id=request.user.id)
+   # taxa = Bairro.objects.get(nome=bairro.bairro)
+   # with connection.cursor() as cursor:
+    ##    cursor.execute(
+       #     'SELECT COD_COMPRA, SUM(TOTAL)+%s FROM CORE_PRODUTOPEDIDO INNER JOIN CORE_PRODUTO ON COD_PROD_ID = COD_ING INNER JOIN CORE_PEDIDO ON COD_PEDIDO_ID = COD_COMPRA INNER JOIN CORE_USUARIO ON COD_CLIENTE_ID = ID WHERE CORE_USUARIO.ID = %s GROUP BY COD_COMPRA ORDER BY COD_COMPRA DESC',
+    #       (taxa.taxa,
+       #      request.user.id,))
+       # total = cursor.fetchall()
 
-def finalizar(request, pk):
-    numero_pedido = Pedido.objects.filter(cod_cliente=request.user.id, finalizado=False)
+    return render(request, 'pedidos.html', {'pedidos':pedidos,
+                                            'produtos':produtos})#, 'produtos':produtos, 'total':total})
+
+def finalizar(request):
     forma = FormaPagamento.objects.all()
-    form = PagamentoModelForm(request.POST or None)
-    bairro = Usuario.objects.get(id=request.user.id)
-    taxa = Bairro.objects.get(nome=bairro.bairro)
-    carrinho = ProdutoPedido.objects.filter(cod_pedido__finalizado=False, cod_pedido__cod_cliente=request.user.id)
-    p = ProdutoPedido.objects.filter(cod_prod__cod_ing=pk, cod_pedido__cod_cliente=request.user.id, cod_pedido__finalizado=False)
-    p.delete()
+    form_pagamento = PagamentoModelForm(request.POST or None)
+    endereco_form = EnderecoModel(request.POST or None)
+    dados = EnderecoClienteModel(request.POST or None)
+    if form_pagamento.is_valid() and dados.is_valid():
+        dados_forma = form_pagamento.cleaned_data
+        dados_bairro = dados.cleaned_data
+        #print(dados_forma['pk_forma'])
+        total = Carrinho.objects.filter(cod_pedido=None,
+                                        cod_cliente=request.user.id,
+                                        cod_cliente__controle_pedido=True).aggregate(Sum('total'))
+        print(total)
 
-    with connection.cursor() as cursor:
-        cursor.execute('SELECT COD_COMPRA, NOME FROM CORE_PRODUTOPEDIDO INNER JOIN CORE_PRODUTO ON COD_PROD_ID = COD_ING INNER JOIN CORE_PEDIDO ON COD_PEDIDO_ID = COD_COMPRA INNER JOIN CORE_USUARIO ON COD_CLIENTE_ID = ID WHERE CORE_USUARIO.ID = %s AND FINALIZADO = %s', (request.user.id, False))
-        linha = cursor.fetchall()
-    if form.is_valid():
-        with connection.cursor() as cursor:
-            cursor.execute('SELECT COD_COMPRA, SUM(TOTAL) FROM CORE_PRODUTOPEDIDO INNER JOIN CORE_PRODUTO ON COD_PROD_ID = COD_ING INNER JOIN CORE_PEDIDO ON COD_PEDIDO_ID = COD_COMPRA INNER JOIN CORE_USUARIO ON COD_CLIENTE_ID = ID WHERE CORE_USUARIO.ID = %s AND COD_COMPRA = %s ORDER BY COD_COMPRA',
-                           (request.user.id, linha[0][0]))
-            total_valor = cursor.fetchall()
-        form = FormaPagamento.objects.get(forma=form.cleaned_data['forma'])
-        pedido = Pedido.objects.filter(controle=True).filter(cod_cliente=request.user.id).filter(status='Não finalizado').update(cod_forma=form.cod_forma, finalizado=True, status='Aguardando confirmação')
+        forma_pagamento = FormaPagamento.objects.get(cod_forma=dados_forma['pk_forma'])
+        dados_endereco_cliente = Endereco.objects.get(numero=dados_bairro['pk'])#, #cod_cliente=request.user.id)
+        endereco_cliente = EnderecoCliente.objects.create(cod_cliente=request.user,
+                                                          cod_endereco=dados_endereco_cliente)
+        pedido = Pedido.objects.create(cod_forma=forma_pagamento,
+                                       total=total['total__sum'] + dados_endereco_cliente.bairro.taxa,
+                                       status='Aguardando confirmação',
+                                       cod_endereco=endereco_cliente)
+        atualiza_carrinho = Carrinho.objects.filter(cod_pedido=None,
+                                                    cod_cliente=request.user.id,
+                                                    cod_cliente__controle_pedido=True).update(cod_pedido=pedido)
+        atualiza_usuario = Usuario.objects.filter(id=request.user.id,
+                                                  controle_pedido=True).update(controle_pedido=False)
         return redirect('index')
-    return render(request, 'finalizar.html', {'forma':forma, 'carrinho':carrinho, 'produtos':linha, 'pedido':numero_pedido})
+
+        #print(total['total__sum'] + total2.bairro.taxa)
+    if endereco_form.is_valid():
+        print('e21ko412')
+        endereco_form.save()
+        print('41241')
+    #endereco_cliente = EnderecoCliente.objects.create(cod_cliente=request.user,
+   #                                                   cod_endereco=numero)
+    carrinho = Carrinho.objects.filter(cod_pedido=None,
+                                       cod_cliente=request.user.id,
+                                       cod_cliente__controle_pedido=True)
+    #enderecos = Endereco.objects.filter(cod_cliente=request.user.id)
+    enderecos = Endereco.objects.all()
+    return render(request, 'finalizar.html', {'carrinho':carrinho,
+                                              'forma':forma,
+                                              'enderecos':enderecos,
+                                              'form':dados})#,
+                  #{'carrinho':carrinho,
+                  # 'forma':forma})
 
 def taxas(request):
-    taxas = Bairro.objects.all()
-    return render(request, 'taxa.html', {'taxas':taxas})
+    if request.user.is_staff:
+        #request.method
+        form = TaxasModel(request.POST or None)
+
+        if form.is_valid():
+            form.save()
+        taxas = Bairro.objects.all()
+
+        return render(request, 'taxas.html', {'taxas': taxas,
+                                              'form':form})
+    else:
+        taxas = Bairro.objects.all()
+        return render(request, 'taxa.html', {'taxas':taxas})
+
+def deletar(request, pk):
+    produto = Carrinho.objects.filter(cod_prod__cod_prod=pk,
+                                      cod_cliente=request.user.id,
+                                      cod_pedido=None)
+    produto.delete()
+    carrinho = Carrinho.objects.filter(cod_pedido=None,
+                                       cod_cliente=request.user.id,
+                                       cod_cliente__controle_pedido=True)
+    if carrinho:
+        return redirect('finalizar')
+    else:
+        return redirect('index')
+
+
+
+'''Funções da área ADM'''
+def produtos(request):
+    print("21312321", request.FILES)
+    form = ProdutoForm(request.POST, request.FILES)
+    print(request.FILES)
+    #print(form)
+    if form.is_valid():
+        form.save()
+        print('hmmm')
+    else:
+        print('erro')
+    produtos = Produto.objects.all()
+    tipos = Tipo.objects.all()
+    return render(request, 'produtos.html', {'produtos':produtos,
+                                             'tipos':tipos,
+                                             'form':form})
+
+def deletar_produto(request, pk):
+    produto = Produto.objects.filter(cod_prod=pk)
+    produto.delete()
+
+    return redirect('produtos')
+
+def tipos_produtos(request):
+    form = TipoProdutos(request.POST or None)
+
+    if form.is_valid():
+        form.save()
+    tipos = Tipo.objects.all()
+
+    return render(request, 'tipos.html', {'tipos':tipos})
+
+def deletar_tipo(request, pk):
+    tipo = Tipo.objects.filter(cod_tipo=pk)
+    tipo.delete()
+
+    return redirect('tipos_produtos')
+
+def tipos_pagamento(request):
+    form = FormaPagamentoModel(request.POST or None)
+
+    if form.is_valid():
+        form.save()
+    formas = FormaPagamento.objects.all()
+
+    return render(request, 'tipos_pagamento.html', {'formas':formas})
+
+def deletar_forma(request, pk):
+    forma = FormaPagamento.objects.filter(cod_tipo=pk)
+    forma.delete()
+
+    return redirect('tipos_pagamento')
+
+def deletar_taxa(request, pk):
+    taxa = Bairro.objects.filter(cod_bairro=pk)
+    taxa.delete()
+
+    return redirect('taxas')

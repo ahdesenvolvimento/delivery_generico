@@ -46,38 +46,46 @@ class Usuario(AbstractUser):
     username = models.CharField('Username', max_length=25, unique=True)
     email = models.EmailField('Email', max_length=75)
     telefone = models.CharField('Telefone', max_length=15)
-    numero = models.IntegerField('Número')
-    bairro = models.CharField('Bairro', max_length=50)
-    cep = models.CharField('CEP', max_length=50)
-    complemento = models.CharField('Complemento', max_length=100)
-    ponto = models.CharField('Ponto de referência', max_length=50, default=None)
+    controle_pedido = models.BooleanField('Pedido finalizado?', default=False)
 
     is_staff = models.BooleanField('Membro da equipe', default=False)
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['first_name', 'last_name', 'email', 'telefone', 'numero', 'bairro', 'cep', 'complemento', 'ponto']
+    REQUIRED_FIELDS = ['first_name', 'last_name', 'email', 'telefone']
     objects = BaseManager()
 
+class Endereco(models.Model):
+    numero = models.AutoField('Número', primary_key=True)
+    bairro = models.ForeignKey(Bairro, on_delete=models.CASCADE)
+    cep = models.CharField('CEP', max_length=50)
+    complemento = models.CharField('Complemento', max_length=100)
+    ponto = models.CharField('Ponto de referência', max_length=50, default=None)
+    #cod_cliente = models.ForeignKey(Usuario, on_delete=models.CASCADE, default=None, null=True)
+
+class EnderecoCliente(models.Model):
+    cod_cliente = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    cod_endereco = models.ForeignKey(Endereco, on_delete=models.CASCADE)
+
 class Base(models.Model):
-    criacao = models.DateField('Criação', auto_now_add=True)
+    criacao = models.DateTimeField('Criação', auto_now_add=True)
     modificacao = models.DateField('Modificação', auto_now=True)
 
-   # class Meta:
-     #   abstract = True
+    class Meta:
+        abstract = True
 
-class Primario(models.Model):
-    cod_pri = models.AutoField('Código da matéria prima', primary_key=True)
-    nome = models.CharField('Nome base', max_length=50)
+class Tipo(models.Model):
+    cod_tipo = models.AutoField('Código do tipo do produto', primary_key=True)
+    tipo = models.CharField('Tipo', max_length=50)
 
     def __str__(self):
-        return self.nome
+        return self.tipo
 
 class Produto(models.Model):
-    cod_ing = models.AutoField('Código do produto', primary_key=True)
+    cod_prod = models.AutoField('Código do produto', primary_key=True)
     nome = models.CharField('Nome do produto', max_length=50)
-    #ingredientes = models.CharField('Ingredientes', max_length=50)
+    ingredientes = models.CharField('Ingredientes', max_length=50)
     descricao = models.TextField('Descrição do produto', max_length=120)
     valor = models.FloatField('Preço')
-    cod_primario = models.ForeignKey(Primario, on_delete=models.CASCADE)
+    cod_tipo = models.ForeignKey(Tipo, on_delete=models.CASCADE)
     imagem = StdImageField('Imagem', upload_to='produtos', variations={'thumb':(124,124)})
 
     class Meta:
@@ -89,7 +97,7 @@ class Produto(models.Model):
 
 class FormaPagamento(models.Model):
     cod_forma = models.AutoField('Código', primary_key=True)
-    forma = models.CharField('Forma de pagamento', max_length=75)
+    forma = models.CharField('Forma de pagamento', max_length=75, unique=True)
     class Meta:
         verbose_name = 'Forma de pagamento'
         verbose_name_plural = 'Formas de pagamento'
@@ -97,37 +105,25 @@ class FormaPagamento(models.Model):
         return self.forma
 
 class Pedido(Base):
-    UNITY_CHOICES = (
-        ('Aguardando confirmação', 'Aguardando confirmação'),
-        ('Pedido em produção', 'Pedido em produção'),
-        ('Saiu para entrega', 'Saiu para entrega'),
-        ('Entregue', 'Entregue'),
-    )
-    cod_compra = models.AutoField('Código do pedido', primary_key=True)
-    status = models.CharField('Status do pedido', max_length=70, choices=UNITY_CHOICES, default='Não finalizado')
-    cod_cliente = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-    controle = models.BooleanField('Controle', default=False)
-    finalizado = models.BooleanField('Pedido Finalizado?', default=False)
-    cod_forma = models.ForeignKey(FormaPagamento, on_delete=models.Model, null=True)
-    #total = models.FloatField('Total em R$')
+    cod_pedido = models.AutoField('Código do pedido', primary_key=True)
+    status = models.CharField('Status do pedido', max_length=70, default='Não finalizado')
+    cod_forma = models.ForeignKey(FormaPagamento, on_delete=models.CASCADE, null=True)
+    total = models.FloatField('Total em R$')
+    cod_endereco = models.ForeignKey(EnderecoCliente, on_delete=models.CASCADE)
 
-class ProdutoPedido(models.Model):
+class Carrinho(Base):
     cod = models.AutoField('Código', primary_key=True)
-    cod_pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)
     cod_prod = models.ForeignKey(Produto, on_delete=models.CASCADE)
+    cod_pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE, null=True)
+    cod_cliente = models.ForeignKey(Usuario, on_delete=models.CASCADE, default=None)
+    observacao = models.TextField('Observação', max_length=75, null=True, default=None)
     quantidade = models.IntegerField('Quantidade')
+   #cod_motoboy = models.ForeignKey(Motoboy, on_delete=models.CASCADE, default=None)
     total = models.FloatField('Total', default=None, null=True)
 
     class Meta:
-        verbose_name = 'Produto pedido'
-        verbose_name_plural = 'Produtos pedidos'
-
-
-class Teste(models.Model):
-    x = models.CharField('test', max_length=142151)
-    y = models.ForeignKey(Produto, max_length=512, default=0, on_delete=models.CASCADE)
-class Teste2(models.Model):
-    k = models.CharField('teste', max_length=142151)
+        verbose_name = 'Carrinho'
+        verbose_name_plural = 'Carrinhos'
 
 
 

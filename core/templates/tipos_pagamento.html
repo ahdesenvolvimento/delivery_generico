@@ -1,0 +1,21 @@
+{% extends 'base.html'%}
+{% block content %}
+<br>
+<br><br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+{% for i in formas %}
+<p>{{i}}</p>
+<a href="{% url 'deletar_forma' i.cod_forma %}">Deletar</a>
+{% endfor %}
+<form action="" method="POST">
+    {% csrf_token %}
+    <input type="text" id="forma" name="forma" maxlength="75" placeholder="Formas de pagamento">
+    <button type="submit">Salvar</button>
+</form>
+{% endblock %}

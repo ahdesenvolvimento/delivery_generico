@@ -1,0 +1,22 @@
+{% extends 'base.html'%}
+{% block content %}
+<br>
+<br><br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+{% for i in tipos %}
+<p>{{i}}</p>
+{{i.cod_forma}}
+<a href="{% url 'deletar_tipo' i.cod_tipo%}">Deletar</a>
+{% endfor %}
+<form action="" method="POST">
+    {% csrf_token %}
+    <input type="text" id="tipo" name="tipo" maxlength="50" placeholder="Tipos">
+    <button type="submit">Salvar</button>
+</form>
+{% endblock %}

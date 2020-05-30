@@ -1,0 +1,17 @@
+{% extends 'base.html'%}
+{% load static %}
+{% block content %}
+<br>
+<br><br>
+<br>
+
+{% for i in taxas %}
+    <p>{{i}}</p>
+    <a href="{% url 'deletar_taxa' i.cod_bairro %}">Deletar</a>
+{% endfor %}
+<form action="" method="POST" class="form" enctype="multipart/form-data">
+    {% csrf_token %}
+    <button type="submit">Salvar</button>
+    {{form.as_p}}
+</form>
+{% endblock %}

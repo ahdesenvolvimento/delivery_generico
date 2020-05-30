@@ -7,21 +7,12 @@
 <body>
     <form method="post" action="">
         {% csrf_token %}
-        <input type="text" id="username" name="username" placeholder="Email">
+        <input type="text" id="username" name="username" placeholder="Nome">
         <input type="email" id="email" name="email" placeholder="Email">
         <input type="text" id="first_name" name="first_name"placeholder="primeiro nome">
         <input type="text" id="last_name" name="last_name" placeholder="ultimo nome">
         <input type="password" id="password" name="password" placeholder="senhae">
         <input type="text" id="telefone" name="telefone" placeholder="N">
-        <input type="number" id="numero" name="numero" placeholder="N">
-        <select id="bairro" name="bairro">
-            {% for i in bairro %}
-                <option value="{{i.nome}}">{{i.nome}}</option>
-            {% endfor %}
-        </select>
-        <input type="text" id="cep" name="cep"placeholder="CEP">
-        <input type="text" id="complemento" name="complemento" placeholder="Complemento">
-        <input type="text" id="ponto" name="ponto" placeholder="ponto">
 
         <button type="submit">Cadastrar</button>
     </form>
