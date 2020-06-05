@@ -1,17 +1,63 @@
 {% extends 'base.html'%}
 {% load static %}
 {% block content %}
-<br>
-<br><br>
-<br>
 
-{% for i in taxas %}
-    <p>{{i}}</p>
-    <a href="{% url 'deletar_taxa' i.cod_bairro %}">Deletar</a>
-{% endfor %}
-<form action="" method="POST" class="form" enctype="multipart/form-data">
-    {% csrf_token %}
-    <button type="submit">Salvar</button>
-    {{form.as_p}}
-</form>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-6">
+            <h3>Cadastro de formas de pagamento</h3>
+            <form action="" method="POST" class="form" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="">Nome do bairro</label>
+                            {{form.nome}}
+                            {% if form.nome.errors %}
+                                {% for i in form.nome.errors %}
+                                    <small>{{i}}</small>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="">Taxa R$</label>
+                            {{form.taxa}}
+                            {% if form.taxa.errors %}
+                                {% for i in form.taxa.errors %}
+                                    <small>{{i}}</small>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <button type="submit">Salvar</button> 
+            </form>
+        </div>
+
+        <div class="col-6">
+           <h3>Bairros cadastrados</h3>
+           <table class="table table-bordered">
+                <thead> 
+                    <th>Nome</th>
+                    <th>Valor taxa R$</th>
+                </thead>
+                {% for i in taxas %}
+                    <tbody>
+                        <td>{{i}}</td>
+                        <td>{{i.taxa}}</td>
+                        <td>
+                            <a href="{% url 'deletar_taxa' i.cod_bairro %}">Deletar</a>
+                        </td>
+                    </tbody>
+                {% endfor %}
+
+           </table>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

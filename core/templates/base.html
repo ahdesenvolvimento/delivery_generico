@@ -10,103 +10,98 @@
     <link rel="stylesheet" href="{% static 'js/bootstrap-4.4.1-dist/css/bootstrap.min.css' %}">
 </head>
 <body style="background-color: #f1f1f1;">
-    {% if user.is_authenticated %}
-        {% if user.is_staff %}
-            <div class="row header fixed-top">
-                <div class="col-6">
-                    <h1>NOME DA EMPRESA</h1>
-                </div>
-                <div class="col-6">
-                    <nav class="navbar navbar-expand-lg navbar-light">
-                        <button type="button" class="navbar-toggler" data-target="#menuMovel" data-toggle="collapse">
-                            <span class="navbar-toggler-icon"></span>
-                        </button>
-                        <div class="collapse navbar-collapse" id="menuMovel">
-                            <ul class="navbar-nav">
+    {% if user.is_staff %}
+        <div class="row header fixed-top">
+            <div class="col-6">
+                <h1>NOME DA EMPRESA</h1>
+            </div>
+            <div class="col-6">
+                <nav class="navbar navbar-expand-lg navbar-light">
+                    <button type="button" class="navbar-toggler" data-target="#menuMovel" data-toggle="collapse">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="menuMovel">
+                        <ul class="navbar-nav">
+                            <li class="nav-item">
+                                <a href="{% url 'produtos' %}" class="nav-link">Produtos</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'tipos_pagamento' %}" class="nav-link">Formas de pagamento</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'taxas' %}" class="nav-link">Taxas</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'tipos_produtos' %}" class="nav-link">Tipos de produtos</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">Contato</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'logout' %}">Sair</a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    {% else %}
+        <a href="{% url 'login' %}">Logar</a>
+
+        <div class="row header fixed-top">
+            <div class="col-6">
+                <h1>Nome do estabelecimento</h1>
+            </div>
+            <div class="col-6">
+                <nav class="navbar navbar-expand-lg navbar-light">
+                    <button type="button" class="navbar-toggler" data-target="#menuMovel" data-toggle="collapse">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="menuMovel">
+                        <ul class="navbar-nav">
+                            <li class="nav-item">
+                                <a href="{% url 'index' %}" class="nav-link">Cardápio</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'pedidos' %}" class="nav-link">Meus pedidos</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'taxas' %}" class="nav-link">Taxa</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">Contato</a>
+                            </li>
+                            {% if carrinho %}
                                 <li class="nav-item">
-                                    <a href="{% url 'produtos' %}" class="nav-link">Produtos</a>
+                                    <a href="#" data-toggle="modal" data-target="#modal_carrinho" class="nav-link">Carrinho</a>
                                 </li>
-                                <li class="nav-item">
-                                    <a href="{% url 'tipos_pagamento' %}" class="nav-link">Formas de pagamento</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{% url 'taxas' %}" class="nav-link">Taxas</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{% url 'tipos_produtos' %}" class="nav-link">Tipos de produtos</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link">Contato</a>
-                                </li>
+                            {% endif %}
+                            {% if request.user.is_authenticated %}
                                 <li class="nav-item">
                                     <a class="nav-link" href="{% url 'logout' %}">Sair</a>
                                 </li>
-                            </ul>
-                        </div>
-                    </nav>
-                </div>
+                            {% else %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'login' %}">Logar</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </nav>
             </div>
-        {% else %}
-            <a href="{% url 'login' %}">Logar</a>
-
-            <div class="row header fixed-top">
-                <div class="col-6">
-                    <h1>Nome do estabelecimento</h1>
-                </div>
-                <div class="col-6">
-                    <nav class="navbar navbar-expand-lg navbar-light">
-                        <button type="button" class="navbar-toggler" data-target="#menuMovel" data-toggle="collapse">
-                            <span class="navbar-toggler-icon"></span>
-                        </button>
-                        <div class="collapse navbar-collapse" id="menuMovel">
-                            <ul class="navbar-nav">
-                                <li class="nav-item">
-                                    <a href="{% url 'index' %}" class="nav-link">Cardápio</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{% url 'pedidos' %}" class="nav-link">Meus pedidos</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{% url 'taxas' %}" class="nav-link">Taxa</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link">Contato</a>
-                                </li>
-                                {% if carrinho %}
-                                    <li class="nav-item">
-                                        <a href="#" data-toggle="modal" data-target="#modal_carrinho" class="nav-link">Carrinho</a>
-                                    </li>
-                                {% endif %}
-                                {% if request.user.is_authenticated %}
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="{% url 'logout' %}">Sair</a>
-                                    </li>
-                                {% else %}
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="{% url 'login' %}">Logar</a>
-                                    </li>
-                                {% endif %}
-                            </ul>
-                        </div>
-                    </nav>
-                </div>
-            </div>
-        {% endif %}
-        {% block content %}
-        {% endblock %}
-        <div class="footer">
-            <center>
-                <small>
-                    <span>Git - <a href="https://ahdesenvolvimento.github.io/">https://ahdesenvolvimento.github.io/</a></span>
-                </small>
-                <br>
-                <span>Desenvolvido por Antonio Henrique - 2020 &copy;</span>
-            </center>
         </div>
-    {% else %}
-        <p>LEMBRAR DE COLOCAR OS PRODUTOS AQUI</p>
-    <a href="{% url 'login' %}">login</a>
     {% endif %}
+    {% block content %}
+    {% endblock %}
+    <div class="footer">
+        <center>
+            <small>
+                <span>Git - <a href="https://ahdesenvolvimento.github.io/">https://ahdesenvolvimento.github.io/</a></span>
+            </small>
+            <br>
+            <span>Desenvolvido por Antonio Henrique - 2020 &copy;</span>
+        </center>
+    </div>
     <script src="{% static 'js/funcoes_js.js' %}"></script>
     <script src="{% static 'js/jquery.js' %}"></script>
     <script src="{% static 'js/bootstrap-4.4.1-dist/js/bootstrap.min.js' %}"></script>

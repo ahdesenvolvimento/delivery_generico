@@ -12,7 +12,8 @@
                         <label for>Cliente: {{i.cod_endereco.cod_cliente.username}}</label>
                         <input type="number" id="cod_pedido" name="cod_pedido" value="{{i.cod_pedido}}">
                         <select id="status" name="status">
-                            <option value="Pedido em produção">{{i.status}}</option>
+                            <option value="">{{i.status}}</option>
+                            <option value="Pedido em produção">Pedido em produção</option>
                             <option value="Pedido saiu para entrega">Pedido saiu para entrega</option>
                             <option value="Entregue">Entregue</option>
                         </select>
@@ -63,6 +64,7 @@
                                                         <a class="btn btn-secondary" href="{% url 'login' %}">Logar</a>
                                                     {% else %}
                                                         <input type="number" id="quantidade" name="quantidade" value="1">
+                                                        <textarea cols="20" rows="2" name="observacao" id="observacao" placeholder="Observações"></textarea>
                                                         <button class="btn btn-secondary" type="submit">Adicionar +R$ {{i.valor}}</button>
                                                     {% endif %}
                                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Sair</button>

@@ -1,17 +1,115 @@
 {% extends 'base.html'%}
 {% load static %}
 {% block content %}
-<br>
-<br><br>
-<br>
 
-{% for i in produtos %}
-    <p>{{i}}</p>
-    <a href="{% url 'deletar_produto' i.cod_prod %}">Deletar</a>
-{% endfor %}
-<form action="" method="POST" class="form" enctype="multipart/form-data">
-    {% csrf_token %}
-    <button type="submit">Salvar</button>
-    {{form.as_p}}
-</form>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-6">
+            <h3>Cadastro de produtos</h3>
+            <form action="" method="POST" class="form" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="nome">Nome do produto</label>
+                            <input type="text" name="nome" id="nome" class="form-control">
+                            {% if form.nome.errors %}
+                                {% for error in form.nome.errors %}
+                                    <small class="form-text text-muted">{{error}}</small>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="ingredientes">Ingredientes</label>
+                            <input type="text" name="ingredientes" id="ingredientes" class="form-control">
+                            {% if form.ingredientes.errors %}
+                                {% for error in form.ingredientes.errors %}
+                                    <small class="form-text text-muted">{{error}}</small>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="descricao">Descrição</label>
+                            <textarea cols="50" rows="5" name="descricao" id="descricao" class="form-control"></textarea>
+                            {% if form.descricao.errors %}
+                                {% for error in form.descricao.errors %}
+                                    <small class="form-text text-muted">{{error}}</small>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="valor">Valor R$</label>
+                            <input type="number" name="valor" id="valor" class="form-control">
+                            {% if form.valor.errors %}
+                                {% for error in form.valor.errors %}
+                                    <small class="form-text text-muted">{{error}}</small>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="cod_tipo">Tipo de produto</label>
+                            <select name="cod_tipo" required id="id_cod_tipo" class="form-control">
+                                <option value="" >Selecione um tipo</option>
+                                {% for i in tipos %}
+                                <option value="{{i.cod_tipo}}">{{i.tipo}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="imagem">Foto do produto</label>
+                            <input type="file" name="imagem" id="imagem" accept="image/*" class="form-control-file">
+                        </div>
+                    </div>
+                </div>
+                    
+                <button type="submit">Salvar</button>
+                
+            </form>
+        </div>
+
+        <div class="col-6">
+           <h3>Produtos cadastrados</h3>
+           <table class="table table-bordered">
+                <thead>
+                    
+                    <th>Nome</th>
+                    
+                </thead>
+                {% for i in produtos %}
+                    <tbody>
+                        <td>{{i}}</td>
+                        <td>
+                            <a href="{% url 'deletar_produto' i.cod_prod %}">Deletar</a>
+                        </td>
+                    </tbody>
+                {% endfor %}
+
+           </table>
+           
+        </div>
+    </div>
+
+
+</div>
+
 {% endblock %}

@@ -54,12 +54,13 @@ class Usuario(AbstractUser):
     objects = BaseManager()
 
 class Endereco(models.Model):
-    numero = models.AutoField('Número', primary_key=True)
+    cod_endereco = models.AutoField('Código', primary_key=True)
+    numero_casa = models.IntegerField('Número')
     bairro = models.ForeignKey(Bairro, on_delete=models.CASCADE)
     cep = models.CharField('CEP', max_length=50)
     complemento = models.CharField('Complemento', max_length=100)
     ponto = models.CharField('Ponto de referência', max_length=50, default=None)
-    #cod_cliente = models.ForeignKey(Usuario, on_delete=models.CASCADE, default=None, null=True)
+    cod_cliente = models.ForeignKey(Usuario, on_delete=models.CASCADE, default=None, null=True)
 
 class EnderecoCliente(models.Model):
     cod_cliente = models.ForeignKey(Usuario, on_delete=models.CASCADE)
@@ -109,12 +110,13 @@ class Pedido(Base):
     status = models.CharField('Status do pedido', max_length=70, default='Não finalizado')
     cod_forma = models.ForeignKey(FormaPagamento, on_delete=models.CASCADE, null=True)
     total = models.FloatField('Total em R$')
-    cod_endereco = models.ForeignKey(EnderecoCliente, on_delete=models.CASCADE)
+    tipo_de_entrega = models.CharField('Tipo de entrega', max_length=50)
+    cod_endereco = models.ForeignKey(EnderecoCliente, on_delete=models.PROTECT)
 
 class Carrinho(Base):
     cod = models.AutoField('Código', primary_key=True)
-    cod_prod = models.ForeignKey(Produto, on_delete=models.CASCADE)
-    cod_pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE, null=True)
+    cod_prod = models.ForeignKey(Produto, on_delete=models.PROTECT)
+    cod_pedido = models.ForeignKey(Pedido, on_delete=models.PROTECT, null=True)
     cod_cliente = models.ForeignKey(Usuario, on_delete=models.CASCADE, default=None)
     observacao = models.TextField('Observação', max_length=75, null=True, default=None)
     quantidade = models.IntegerField('Quantidade')

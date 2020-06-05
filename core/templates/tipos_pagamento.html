@@ -1,21 +1,50 @@
 {% extends 'base.html'%}
 {% block content %}
-<br>
-<br><br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-{% for i in formas %}
-<p>{{i}}</p>
-<a href="{% url 'deletar_forma' i.cod_forma %}">Deletar</a>
-{% endfor %}
-<form action="" method="POST">
-    {% csrf_token %}
-    <input type="text" id="forma" name="forma" maxlength="75" placeholder="Formas de pagamento">
-    <button type="submit">Salvar</button>
-</form>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-6">
+            <h3>Cadastro de formas de pagamento</h3>
+            <form action="" method="POST" class="form" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="forma">Forma de pagamento</label>
+                            <input type="text" id="forma" name="forma" class="form-control" maxlength="30">
+                            {% if form.forma.errors %}
+                                {% for error in form.forma.errors %}
+                                    <small class="form-text text-muted">{{error}}</small>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <button type="submit">Salvar</button>
+                
+            </form>
+        </div>
+
+        <div class="col-6">
+           <h3>Formas cadastradas</h3>
+           <table class="table table-bordered">
+                <thead> 
+                    <th>Nome</th>
+                </thead>
+                {% for i in formas %}
+                    <tbody>
+                        <td>{{i}}</td>
+                        <td>
+                            <a href="{% url 'deletar_forma' i.cod_forma %}">Deletar</a>
+                        </td>
+                    </tbody>
+                {% endfor %}
+
+           </table>
+           
+        </div>
+    </div>
+
+
+</div>
 {% endblock %}

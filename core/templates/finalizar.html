@@ -4,18 +4,23 @@
 {% block content %}
     <div class="container-fluid">
         <div class="row">
-            <h3 class="col-12">Carrinho</h3>
-            <form method="post" action="" class="col-12">
-                {% csrf_token %}
-                {% for i in pedido %}
-                    <p>#{{i.cod_compra}}</p>
-                {% endfor %}
-                {% for i in carrinho %}
-                    <p>{{i.cod_prod.nome}} x{{i.quantidade}}</p>
-                    <a href="{% url 'deletar' i.cod_prod.cod_prod %}">Remover</a>
-                {% endfor %}
-            </form>
-            <div class="row col-12">
+            <div class="col-6">
+                <center>
+                <h3>Carrinho</h3>
+                <form method="post" action="">
+                    {% csrf_token %}
+                    {% for i in carrinho %}
+                        <p>{{i.cod_prod.nome}} x{{i.quantidade}}</p>
+                        <small class="form-text text-muted">Obs: {{i.observacao}}</small>
+                        <a href="{% url 'deletar' i.cod_prod.cod_prod %}">Remover</a>
+                    {% endfor %}
+                </form>
+                </center>
+            </div>  
+            <div class="row col-6">
+                
+                <h5>Selecione uma forma de pagamento</h5>
+            
                 <form method="post" action="">
                     {% csrf_token %}
                     {% for i in forma %}
@@ -25,47 +30,73 @@
                             <input type="radio" id="pk_forma" name="pk_forma" value="{{i.cod_forma}}">
                         </div>
                     </div>
+
                     {% endfor %}
-                    {% for i in enderecos %}
-                        <div class="col-12">
-                            <label for="pk">{{i.numero}}{{i.bairro}}</label>
-                            <input type="radio" id="pk" name="pk" value="{{i.numero}}">
-                        </div>
-                    {% endfor %}
-                    <button type="submit">Finalizar</button>
+                    {% if enderecos %}
+                    <h5>Endereços cadastrados</h3>
+                        {% for i in enderecos %}
+                            <div class="col-12 borda">
+                                <label for="pk">{{i.numero}}{{i.bairro}}</label>
+                                <input type="radio" id="pk" name="pk" value="{{i.cod_endereco}}">
+                                <small class="form-text text-muted">CEP: {{i.cep}}</small>
+                                <small class="form-text text-muted">Nº: {{i.numero_casa}}</small>
+                                <small class="form-text text-muted">Complemento: {{i.complemento}}</small>
+                                <small class="form-text text-muted">Ponto de referência: {{i.ponto}}</small>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>Sem endereços salvos</p>
+                        <button data-toggle="modal" data-target="#modal_endereco">Adicionar endereço</button>
+                    {% endif %}
+                    <button data-toggle="modal" data-target="#modal_endereco">Adicionar endereço</button>
+                    <button type="submit">Finalizar</button>    
                 </form>
             </div>
-            <div class="row col-12">
-                <h6>Endereços salvos</h6>
-                {% if enderecos %}
-                    <form method="POST" action="">
-                        {% csrf_token %}
-
-                        <button type="submit">Pronto</button>
-                    </form>
-
-                    <button data-toggle="modal" data-target="#modal_endereco">Adicionar endereço</button>
-                {% else %}
-                    <p>Sem endereços salvos</p>
-                    <button data-toggle="modal" data-target="#modal_endereco">Adicionar endereço</button>
-                {% endif %}
-                <div class="modal fade" id="modal_endereco">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h6 class="modal-title">Opa</h6>
-                            </div>
-                            <form action="" method="POST">
-                                {% csrf_token %}
-                                <div class="modal-body">
-                                    {{form.as_p}}
-                                </div>
-
-                                <div class="modal-footer">
-                                    <button type="submit">Salvar</button>
-                                </div>
-                            </form>
+    
+            <div class="modal fade" id="modal_endereco">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h6 class="modal-title">Endereço</h6>
+                            <button type="button" data-dismiss="modal" class="close">&times;</button>
                         </div>
+                        <form action="" method="POST">
+                            {% csrf_token %}
+                            <div class="modal-body">                           
+                            
+                                <div class="form-group">
+                                    <label for="numero_casa">Nº</label>
+                                    <input name="numero_casa" id="numero_casa" type="number" class="form-control">
+                                </div>
+                        
+                                <div class="form-group">
+                                    <select id="bairro" name="bairro" class="form-control">
+                                        {% for i in taxas %}
+                                            <option value="{{i.cod_bairro}}">{{i.nome}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                                
+                                <div class="form-group">
+                                    <label for="cep">CEP</label>
+                                    <input name="cep" id="cep" type="text" maxlength="50" class="form-control">
+                                </div>
+                                                        
+                                <div class="form-group">
+                                    <label for="complemento">Complemento</label>
+                                    <input name="complemento" id="complemento" type="text" maxlength="100" class="form-control">
+                                </div>
+                                                
+                                <div class="form-group">
+                                    <label for="ponto">Ponto de referência</label>
+                                    <input name="ponto" id="ponto" type="text" maxlength="50" class="form-control">
+                                </div>                          
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="submit">Salvar</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
