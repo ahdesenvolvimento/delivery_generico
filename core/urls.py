@@ -3,7 +3,7 @@ from .views import index,\
     cadastro, pedidos, finalizar,\
     taxas, deletar, produtos, tipos_produtos,\
     deletar_tipo, tipos_pagamento, deletar_forma, \
-    deletar_produto, deletar_taxa
+    deletar_produto, deletar_taxa, deletar_produto_carrinho_index, administracao
 urlpatterns = [
     path('', index, name='index'),
     path('cadastro', cadastro, name='cadastro'),
@@ -18,6 +18,8 @@ urlpatterns = [
     path('tipos_pagamento', tipos_pagamento, name='tipos_pagamento'),
     path('deletar_forma/<int:pk>', deletar_forma, name='deletar_forma'),
     path('deletar_taxa/<int:pk>', deletar_taxa, name='deletar_taxa'),
+    path('deletar_produto_index/<int:pk>', deletar_produto_carrinho_index, name='deletar_produto_carrinho_index'),
+    path('administracao', administracao, name='administracao'),
 
     #path('', include('core.urls')),
 ]

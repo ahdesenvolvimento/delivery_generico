@@ -45,7 +45,7 @@ class Bairro(models.Model):
 class Usuario(AbstractUser):
     username = models.CharField('Username', max_length=25, unique=True)
     email = models.EmailField('Email', max_length=75)
-    telefone = models.CharField('Telefone', max_length=15)
+    telefone = models.CharField('Telefone', max_length=11)
     controle_pedido = models.BooleanField('Pedido finalizado?', default=False)
 
     is_staff = models.BooleanField('Membro da equipe', default=False)
@@ -118,7 +118,7 @@ class Carrinho(Base):
     cod_prod = models.ForeignKey(Produto, on_delete=models.PROTECT)
     cod_pedido = models.ForeignKey(Pedido, on_delete=models.PROTECT, null=True)
     cod_cliente = models.ForeignKey(Usuario, on_delete=models.CASCADE, default=None)
-    observacao = models.TextField('Observação', max_length=75, null=True, default=None)
+    observacao = models.TextField('Observação', max_length=75, null=True, default='Sem observações', blank=True)
     quantidade = models.IntegerField('Quantidade')
    #cod_motoboy = models.ForeignKey(Motoboy, on_delete=models.CASCADE, default=None)
     total = models.FloatField('Total', default=None, null=True)

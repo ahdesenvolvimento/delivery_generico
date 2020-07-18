@@ -4,52 +4,99 @@
 {% block content %}
     <div class="container-fluid">
         <div class="row">
-            <div class="col-6">
+            <div class="col-12 col-sm-12 col-md-6 col-lg-6">
                 <center>
                 <h3>Carrinho</h3>
+                <p>Total: R$ </p>
                 <form method="post" action="">
                     {% csrf_token %}
-                    {% for i in carrinho %}
-                        <p>{{i.cod_prod.nome}} x{{i.quantidade}}</p>
-                        <small class="form-text text-muted">Obs: {{i.observacao}}</small>
-                        <a href="{% url 'deletar' i.cod_prod.cod_prod %}">Remover</a>
-                    {% endfor %}
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Produto</th>
+                                <th>Qtd</th>
+                                <th>OBS</th>
+                                <th>Valor (R$)</th>
+                
+                            </tr>
+                        </thead>
+                        {% for i in carrinho %}
+                            <tbody>
+                                <tr>
+                                    <td>{{i.cod_prod}}</td>
+                                    <td>{{i.quantidade}}</td>
+                                    {% if i.observacao %}
+                                        <td>{{i.observacao}}</td>
+                                    {% else %}
+                                        <td>Sem OBS</td>
+                                    {% endif %}
+                                    <td>{{i.cod_prod.valor}}</td>
+                                    <td><a href="{% url 'deletar' i.cod_prod.cod_prod %}">Remover</a></td>
+                                </tr>
+                            </tbody>
+                        {% endfor %}
+                        <tfoot>
+                            <tr>
+                                <th>Total</th>
+                                <td></td>
+                                <td></td>
+                                <td>5000</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                        
+                 
                 </form>
                 </center>
             </div>  
-            <div class="row col-6">
+            <div class="col-12 col-sm-12 col-md-6 col-lg-6">
                 
-                <h5>Selecione uma forma de pagamento</h5>
+                <h5>Selecione uma forma de pagamento abaixo</h5>
+                
+                {% if forma_validado.pk_forma.errors %}
+                    <p><strong>{{forma_validado.pk_forma.errors}}</strong></p>
+                {% endif %}
             
                 <form method="post" action="">
                     {% csrf_token %}
                     {% for i in forma %}
                     <div class="form-row">
-                        <div class="form-group col-12">
+                        <div class="form-group col-12 col-sm-12 col-md-12 col-lg-12">
                             <label for="pk_forma">{{i.forma}}</label>
                             <input type="radio" id="pk_forma" name="pk_forma" value="{{i.cod_forma}}">
                         </div>
                     </div>
 
                     {% endfor %}
+                
+            
                     {% if enderecos %}
-                    <h5>Endereços cadastrados</h3>
-                        {% for i in enderecos %}
-                            <div class="col-12 borda">
-                                <label for="pk">{{i.numero}}{{i.bairro}}</label>
-                                <input type="radio" id="pk" name="pk" value="{{i.cod_endereco}}">
-                                <small class="form-text text-muted">CEP: {{i.cep}}</small>
-                                <small class="form-text text-muted">Nº: {{i.numero_casa}}</small>
-                                <small class="form-text text-muted">Complemento: {{i.complemento}}</small>
-                                <small class="form-text text-muted">Ponto de referência: {{i.ponto}}</small>
-                            </div>
-                        {% endfor %}
+                        <h5>Endereços cadastrados</h3>
+                        {% if form.numero_casa.errors%}
+                            <p><strong>Erro ao tentar salvar o endereço, por favor tente novamente</strong></p>
+                        {% endif %}
+                        <button data-toggle="modal" data-target="#modal_endereco" type="button" class="btn btn-primary">Adicionar endereço</button>
+                        <button type="submit" class="btn btn-primary">Finalizar</button>    
+                    {% if dados.pk.errors %}
+                        <strong>{{dados.pk.errors}}</strong>
+                    {% endif %}
+                        <div class="row">
+                            {% for i in enderecos %}
+                                <div class="col-4 col-sm-4 col-md-4 col-lg-4 borda">
+                                    <label for="pk">{{i.numero}}{{i.bairro}}</label>
+                                    <input type="radio" id="pk" name="pk" value="{{i.cod_endereco}}">
+                                    <small class="form-text text-muted">CEP: {{i.cep}}</small>
+                                    <small class="form-text text-muted">Nº: {{i.numero_casa}}</small>
+                                    <small class="form-text text-muted">Complemento: {{i.complemento}}</small>
+                                    <small class="form-text text-muted">Ponto de referência: {{i.ponto}}</small>
+                                    <small class="form-text text-muted">Taxa de entrega: R$ {{i.bairro.taxa}}</small>
+                                </div>
+                            {% endfor %}
+                        </div>
                     {% else %}
                         <p>Sem endereços salvos</p>
                         <button data-toggle="modal" data-target="#modal_endereco">Adicionar endereço</button>
                     {% endif %}
-                    <button data-toggle="modal" data-target="#modal_endereco">Adicionar endereço</button>
-                    <button type="submit">Finalizar</button>    
                 </form>
             </div>
     
@@ -63,10 +110,12 @@
                         <form action="" method="POST">
                             {% csrf_token %}
                             <div class="modal-body">                           
-                            
                                 <div class="form-group">
                                     <label for="numero_casa">Nº</label>
                                     <input name="numero_casa" id="numero_casa" type="number" class="form-control">
+                                    {% if form.numero_casa.errors%}
+                                        {{form.numero_casa.errors}}
+                                    {% endif %}
                                 </div>
                         
                                 <div class="form-group">
@@ -100,6 +149,7 @@
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 

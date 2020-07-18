@@ -1,0 +1,63 @@
+{% extends 'base_adm.html' %}
+{% block content %}
+<div class="container-fluid index">
+    <h4>Bem vindo a administração do sistema</h4>
+    <button>Listar apenas não entregues</button>
+    <button>Listar todos os pedidos</button>
+
+
+     {% for i in pedidos %}
+        <form method="POST" action="" style="padding-bottom: 1.5%;">
+
+             {% csrf_token %}
+             <div class="row border">
+                <h6 class="col-12">Cliente: {{i.cod_endereco.cod_cliente.username}}</h6>
+                <div class="form-group col-3">
+                    <input type="number" id="cod_pedido" class="form-control" name="cod_pedido" value="{{i.cod_pedido}}">
+                </div>
+                <div class="form-group col-6">
+                    <select id="status" name="status" class="form-control">
+                        <option value="">{{i.status}}</option>
+                        <option value="Pedido em produção">Pedido em produção</option>
+                        <option value="Pedido saiu para entrega">Pedido saiu para entrega</option>
+                        <option value="Entregue">Entregue</option>
+                    </select>
+                </div>
+                <div class="col-3">
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+                <div class="col-12">
+                    <strong>Dados do pedido</strong>
+                    {% for j in produtos %}
+                        {% if i.cod_pedido == j.cod_pedido.cod_pedido %}
+                            <p>Item pedido {{i.cod_pedido}}: {{j.cod_prod.nome}}</p>
+                            <p>Qtd: {{j.quantidade}}</p>
+                        {% endif %}
+                    {% endfor %}
+                    <p>Forma de pagamento: {{i.cod_forma}}</p>
+                </div>
+                <div class="col-12">
+                    <strong>Dados do cliente</strong>
+                    <div class="row">
+                        <div class="col-3"><p>Nº: {{i.cod_endereco.cod_endereco.cep}}</p></div>
+                        <div class="col-3"><p>Complemento: {{i.cod_endereco.cod_endereco.complemento}}</p></div>
+
+                        <div class="col-6"><p>CEP: {{i.cod_endereco.cod_endereco.cep}}</p></div>
+
+                        <div class="col-3"><p>Bairro: {{i.cod_endereco.cod_endereco.bairro.nome}}</p></div>
+                        <div class="col-3"><p>Ponto de referência: {{i.cod_endereco.cod_endereco.ponto}}</p></div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <p><strong>Valor total: R$ {{i.total}}</strong></p>
+                    <p><strong>Valor entregador: R$ {{i.cod_endereco.cod_endereco.bairro.taxa}}</strong></p>
+                    
+                </div>
+                
+            </div>
+            
+        </form>
+
+     {% endfor %}
+ </div>
+{% endblock %}

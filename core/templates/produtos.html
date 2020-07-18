@@ -1,15 +1,15 @@
-{% extends 'base.html'%}
+{% extends 'base_adm.html'%}
 {% load static %}
 {% block content %}
 
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-6">
+    <div class="row border">
+        <div class="col-6 col-sm-6 col-md-6 col-lg-6">
             <h3>Cadastro de produtos</h3>
             <form action="" method="POST" class="form" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="row">
-                    <div class="col-6">
+                    <div class="col-6 col-sm-6 col-md-6 col-lg-6">
                         <div class="form-group">
                             <label for="nome">Nome do produto</label>
                             <input type="text" name="nome" id="nome" class="form-control">
@@ -22,7 +22,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-6">
+                    <div class="col-6 col-sm-6 col-md-6 col-lg-6">
                         <div class="form-group">
                             <label for="ingredientes">Ingredientes</label>
                             <input type="text" name="ingredientes" id="ingredientes" class="form-control">
@@ -35,7 +35,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-6">
+                    <div class="col-6 col-sm-6 col-md-6 col-lg-6">
                         <div class="form-group">
                             <label for="descricao">Descrição</label>
                             <textarea cols="50" rows="5" name="descricao" id="descricao" class="form-control"></textarea>
@@ -48,7 +48,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-6">
+                    <div class="col-6 col-sm-6 col-md-6 col-lg-6">
                         <div class="form-group">
                             <label for="valor">Valor R$</label>
                             <input type="number" name="valor" id="valor" class="form-control">
@@ -61,7 +61,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-6">
+                    <div class="col-6 col-sm-6 col-md-6 col-lg-6">
                         <div class="form-group">
                             <label for="cod_tipo">Tipo de produto</label>
                             <select name="cod_tipo" required id="id_cod_tipo" class="form-control">
@@ -74,7 +74,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-6">
+                    <div class="col-6 col-sm-6 col-md-6 col-lg-6">
                         <div class="form-group">
                             <label for="imagem">Foto do produto</label>
                             <input type="file" name="imagem" id="imagem" accept="image/*" class="form-control-file">
@@ -82,25 +82,27 @@
                     </div>
                 </div>
                     
-                <button type="submit">Salvar</button>
+                <button type="submit" class="btn btn-success">Salvar</button>
                 
             </form>
         </div>
 
-        <div class="col-6">
+        <div class="col-6 col-sm-6 col-md-6 col-lg-6">
            <h3>Produtos cadastrados</h3>
            <table class="table table-bordered">
                 <thead>
-                    
-                    <th>Nome</th>
-                    
+                    <tr>
+                        <th>Nome</th>
+                    </tr>
                 </thead>
                 {% for i in produtos %}
                     <tbody>
-                        <td>{{i}}</td>
-                        <td>
-                            <a href="{% url 'deletar_produto' i.cod_prod %}">Deletar</a>
-                        </td>
+                        <tr>
+                            <td>{{i}}</td>
+                            <td>
+                                <a href="{% url 'deletar_produto' i.cod_prod %}">Deletar</a>
+                            </td>
+                        </tr>
                     </tbody>
                 {% endfor %}
 

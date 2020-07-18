@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 #from .models import Usuarios
+from datetime import date
+
 from .models import Tipo, Produto, Pedido, Carrinho, FormaPagamento, Bairro, Usuario, EnderecoCliente, Endereco
 from .forms import UserModelForm, ProdutoModelForm,\
     PagamentoModelForm, CarrinhoModelForm, AtualizaPedido,\
@@ -13,27 +15,9 @@ from django.db.models import Sum
 
 def index(request):
     if request.user.is_staff:
-        pedidos = Pedido.objects.all().order_by('-cod_pedido')
-        produtos = Carrinho.objects.all()
-       # with connection.cursor() as cursor:
-         #   cursor.execute(
-           #     'SELECT USERNAME, COD_PEDIDO, STATUS, NOME FROM CORE_PEDIDO INNER JOIN CORE_BASEPEDIDO ON COD_CARRINHO_ID = COD_BASE INNER JOIN CORE_CARRINHO ON COD_PSEUDO_PEDIDO_ID = COD_BASE INNER JOIN CORE_PRODUTO ON COD_PROD_ID = COD_PROD INNER JOIN CORE_USUARIO ON COD_CLIENTE_ID = ID'
-          #  )
-          #  pedidos = cursor.fetchall()
-       # print(pedidos[0])
 
-        form = AtualizaPedido(request.POST or None)
-
-        if form.is_valid():# and form2.is_valid():
-            print(form.cleaned_data)
-            #print(form2.cleaned_data)
-            pedido = Pedido.objects.filter(cod_pedido=request.POST.get('cod_pedido')).update(status=form.cleaned_data['status'])
-            print(request.POST.get("cod_pseudo_pedido"))
-            print('ops')
-        else:
-            print('haha')
-        return render(request, 'index.html', {'pedidos':pedidos,
-                                              'produtos':produtos})
+        return redirect('administracao')#, {'pedidos':pedidos,
+                                              #'produtos':produtos})
 
     else:
         if str(request.method == 'POST'):
@@ -42,6 +26,10 @@ def index(request):
             print('começo')
             form_produto = ProdutoModelForm(request.POST)
             form_carrinho = CarrinhoModelForm(request.POST)
+            if form_carrinho.is_valid():
+                print('12312ij312o')
+            else:
+                print('ta invalido')
             if form_produto.is_valid() and form_carrinho.is_valid():
                 print('formulario')
                 dados_prod = form_produto.cleaned_data
@@ -54,17 +42,15 @@ def index(request):
                                                  cod_cliente__controle_pedido=True,
                                                  cod_prod__nome=dados_prod['nome'])
                     print(carro)
-                    #existe = Carrinho.objects.filter(cod_pseudo_pedido=variavel.cod_base,
-                    #                                 cod_pseudo_pedido__cod_cliente=request.user.id,
-                    #
-                    #                                 cod_prod__nome=dados_prod['nome'])
 
                     with connection.cursor() as cursor:
                         cursor.execute(
-                            'SELECT NOME, QUANTIDADE, VALOR FROM CORE_PRODUTO P INNER JOIN CORE_CARRINHO C ON P.COD_PROD = C.COD_PROD_ID INNER JOIN CORE_USUARIO U ON COD_CLIENTE_ID = U.ID WHERE U.ID = %s AND CONTROLE_PEDIDO = %s AND NOME = %s',
+                            'SELECT NOME, QUANTIDADE, VALOR FROM CORE_PRODUTO P INNER JOIN CORE_CARRINHO C ON P.COD_PROD = C.COD_PROD_ID INNER JOIN CORE_USUARIO U ON COD_CLIENTE_ID = U.ID WHERE U.ID = %s AND CONTROLE_PEDIDO = %s AND NOME = %s AND C.COD_PEDIDO_ID IS NULL',
                             (request.user.id, True, dados_prod['nome']))
                         linhas = cursor.fetchall()
+
                     quantidade = linhas[0][1] + dados_carrinho['quantidade']
+
                     total = quantidade * linhas[0][2]
                     atualiza_carrinho = Carrinho.objects.filter(cod_pedido=None,
                                                                 cod_cliente=request.user.id,
@@ -81,11 +67,8 @@ def index(request):
 
                 except ObjectDoesNotExist:
                     print('entrei aqui except')
-                   # base = BasePedido.objects.create(cod_cliente=request.user,
-                    #                                 controle=True)
-                   # base.save()
                     total = prod.valor * dados_carrinho['quantidade']
-                    print('aqui carrinho')
+
                     carrinho = Carrinho.objects.create(cod_prod=prod,
                                                        quantidade=dados_carrinho['quantidade'],
                                                        cod_cliente=request.user,
@@ -94,8 +77,11 @@ def index(request):
                     usuario = Usuario.objects.filter(id=request.user.id).update(controle_pedido=True)
                     carrinho.save()
 
+            else:
+                print('form invalido')
             carrinho = Carrinho.objects.filter(cod_cliente=request.user.id,
                                                cod_pedido=None)
+
             print(carrinho)
             return render(request,
                           'index.html',
@@ -113,7 +99,8 @@ def cadastro(request):
         if form.is_valid():
             form.save()
             return redirect('contas/login')
-    return render(request, 'cadastro.html', {'bairro':bairros})
+    return render(request, 'cadastro.html', {'bairro':bairros,
+                                             'form':form})
 
 def pedidos(request):
     pedidos = Pedido.objects.filter(cod_endereco__cod_cliente=request.user.id).order_by('-cod_pedido')
@@ -144,7 +131,6 @@ def finalizar(request):
         total = Carrinho.objects.filter(cod_pedido=None,
                                         cod_cliente=request.user.id,
                                         cod_cliente__controle_pedido=True).aggregate(Sum('total'))
-        print(total)
 
         forma_pagamento = FormaPagamento.objects.get(cod_forma=dados_forma['pk_forma'])
         dados_endereco_cliente = Endereco.objects.get(cod_endereco=dados_bairro['pk'])#, #cod_cliente=request.user.id)
@@ -172,8 +158,7 @@ def finalizar(request):
                                            cod_cliente=request.user)
         endereco.save()
         print('41241')
-    else:
-        print('not valid')
+
     #endereco_cliente = EnderecoCliente.objects.create(cod_cliente=request.user,
    #                                                   cod_endereco=numero)
     carrinho = Carrinho.objects.filter(cod_pedido=None,
@@ -186,7 +171,9 @@ def finalizar(request):
                                               'forma':forma,
                                               'enderecos':enderecos,
                                               'form':endereco_form,
-                                              'taxas':taxas})#,
+                                              'taxas':taxas,
+                                              'dados':dados,
+                                              'forma_validado':form_pagamento})#,
                   #{'carrinho':carrinho,
                   # 'forma':forma})
 
@@ -218,9 +205,41 @@ def deletar(request, pk):
     else:
         return redirect('index')
 
+def deletar_produto_carrinho_index(request, pk):
+    produto = Carrinho.objects.filter(cod_prod__cod_prod=pk,
+                                      cod_cliente=request.user.id,
+                                      cod_pedido=None)
+    produto.delete()
+    carrinho = Carrinho.objects.filter(cod_pedido=None,
+                                       cod_cliente=request.user.id,
+                                       cod_cliente__controle_pedido=True)
+    return redirect('index')
+
 
 
 '''Funções da área ADM'''
+
+def administracao(request):
+    data_atual = date.today()
+    pedidos = Pedido.objects.all().filter(modificacao=data_atual).order_by('-cod_pedido')
+
+    produtos = Carrinho.objects.all()
+    # with connection.cursor() as cursor:
+    #   cursor.execute(
+    #     'SELECT USERNAME, COD_PEDIDO, STATUS, NOME FROM CORE_PEDIDO INNER JOIN CORE_BASEPEDIDO ON COD_CARRINHO_ID = COD_BASE INNER JOIN CORE_CARRINHO ON COD_PSEUDO_PEDIDO_ID = COD_BASE INNER JOIN CORE_PRODUTO ON COD_PROD_ID = COD_PROD INNER JOIN CORE_USUARIO ON COD_CLIENTE_ID = ID'
+    #  )
+    #  pedidos = cursor.fetchall()
+    # print(pedidos[0])
+
+    form = AtualizaPedido(request.POST or None)
+
+    if form.is_valid():  # and form2.is_valid():
+        pedido = Pedido.objects.filter(cod_pedido=request.POST.get('cod_pedido')).update(
+            status=form.cleaned_data['status'])
+    else:
+        print('haha')
+    return render(request, 'administracao.html', {'pedidos':pedidos,
+                                                 'produtos':produtos})
 def produtos(request):
     print("21312321", request.FILES)
     form = ProdutoForm(request.POST, request.FILES)

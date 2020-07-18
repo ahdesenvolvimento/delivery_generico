@@ -1,14 +1,14 @@
-{% extends 'base.html'%}
+{% extends 'base_adm.html'%}
 {% block content %}
 
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-6">
+    <div class="row border">
+        <div class="col-6 col-sm-6 col-md-6 col-lg-6">
             <h3>Cadastro de formas de pagamento</h3>
             <form action="" method="POST" class="form" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="row">
-                    <div class="col-6">
+                    <div class="col-6 col-sm-6 col-md-6 col-lg-6">
                         <div class="form-group">
                             <label for="forma">Forma de pagamento</label>
                             <input type="text" id="forma" name="forma" class="form-control" maxlength="30">
@@ -20,23 +20,27 @@
                         </div>
                     </div>
                 </div>
-                <button type="submit">Salvar</button>
+                <button type="submit" class="btn btn-success">Salvar</button>
                 
             </form>
         </div>
 
-        <div class="col-6">
+        <div class="col-6 col-sm-6 col-md-6 col-lg-6">
            <h3>Formas cadastradas</h3>
            <table class="table table-bordered">
-                <thead> 
-                    <th>Nome</th>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                    </tr>
                 </thead>
                 {% for i in formas %}
                     <tbody>
-                        <td>{{i}}</td>
-                        <td>
-                            <a href="{% url 'deletar_forma' i.cod_forma %}">Deletar</a>
-                        </td>
+                        <tr>
+                            <td>{{i}}</td>
+                            <td>
+                                <a href="{% url 'deletar_forma' i.cod_forma %}">Deletar</a>
+                            </td>
+                        </tr>
                     </tbody>
                 {% endfor %}
 

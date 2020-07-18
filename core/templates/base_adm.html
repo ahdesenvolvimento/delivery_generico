@@ -1,0 +1,69 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nome empresa</title>
+    <link rel="stylesheet" href="{% static 'css/normalize.css' %}">
+    <link rel="stylesheet" href="{% static 'css/estilo.css' %}">
+    <link rel="stylesheet" href="{% static 'js/bootstrap-4.4.1-dist/css/bootstrap.min.css' %}">
+</head>
+<body>
+    <div class="row header fixed-top">
+        <div class="col-8 col-sm-8 col-md-8 col-lg-4">
+            <h1><a href="{% url 'index' %}">S.O.S Burguer</a></h1>
+            
+        </div>
+        <div class="col-4 col-sm-4 col-md-4 col-lg-8">
+            <nav class="navbar navbar-expand-lg navbar-light">
+                <button type="button" class="navbar-toggler" data-target="#movelAdm" data-toggle="collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="movelAdm">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a href="{% url 'produtos' %}" class="nav-link">Produtos</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{% url 'tipos_pagamento' %}" class="nav-link">Formas de pagamento</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{% url 'taxas' %}" class="nav-link">Taxas</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{% url 'tipos_produtos' %}" class="nav-link">Tipos de produtos</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">Contato</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'logout' %}">Sair</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+    </div>
+    {% block content %}
+    {% endblock %}
+    <div class="footer">
+        <center>
+            <small>
+                <span>Git - <a href="https://ahdesenvolvimento.github.io/">https://ahdesenvolvimento.github.io/</a></span>
+            </small>
+            <br>
+            <span>Desenvolvido por Antonio Henrique - 2020 &copy;</span>
+        </center>
+    </div>
+    <script src="{% static 'js/funcoes_js.js' %}"></script>
+    <script src="{% static 'js/jquery.js' %}"></script>
+    <script src="{% static 'js/bootstrap-4.4.1-dist/js/bootstrap.min.js' %}"></script>
+</body>
+</html>

@@ -8,7 +8,40 @@ class UserModelForm(forms.ModelForm):
     class Meta:
         model = Usuario
         fields = ['username', 'first_name', 'last_name', 'password', 'email', 'telefone']
+        error_messages = {
+            'telefone': {
+                'required': 'Campo obrigatório, informe o seu DDD'
+            }
+        }
 
+    def clean_username(self):
+        nome = self.cleaned_data['username']
+        existe = Usuario.objects.filter(username=nome)
+        if existe:
+            raise forms.ValidationError('Este nome de usuário já está sendo utilizado!')
+        if len(nome) < 5:
+            raise forms.ValidationError('Informe um nome de usuário com no minimo 5 caracteres!')
+        if chr(48) <= nome[0] <= chr(57):
+            print('deu bo')
+            raise forms.ValidationError('O nome de usuario deve começar com uma letra!')
+        return nome
+
+    def clean_telefone(self):
+        telefone = self.cleaned_data['telefone']
+        existe = Usuario.objects.filter(telefone=telefone)
+        if existe:
+            raise forms.ValidationError('Este telefone já está sendo utilizado!')
+        if len(telefone) < 11 or len(telefone) > 11:
+            raise forms.ValidationError('Informe um numero de telefone válido!')
+        return telefone
+
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        existe = Usuario.objects.filter(email=email)
+        if existe:
+            raise forms.ValidationError('Este email já está sendo utilizado!')
+
+        return email
     def save(self, commit=True):
         user = super(UserModelForm, self).save(commit=False)
         user.set_password(self.cleaned_data['password'])
@@ -23,6 +56,11 @@ class ProdutoModelForm(forms.ModelForm):
 
 class PagamentoModelForm(forms.Form):
     pk_forma = forms.IntegerField()
+    error_messages = {
+        'pk_forma': {
+            'required':'Informe uma forma de pagamento'
+        }
+    }
 
 class CarrinhoModelForm(forms.ModelForm):
     '''
@@ -47,19 +85,32 @@ class CarrinhoModelForm(forms.ModelForm):
         model = Carrinho
         fields = ['quantidade', 'observacao']
 
-    def clean_observacao(self):
-        data = self.cleaned_data['observacao']
-        if 'carlos' not in data:
-            print("sem carlinhos")
-            raise forms.ValidationError('Tek qe ter o carls')
-        return data
-
 class AtualizaPedido(forms.ModelForm):
     class Meta:
         model = Pedido
-        fields = ['cod_pedido', 'status']
+        fields = ['status']
 
 
+class EnderecoModel(forms.ModelForm):
+    class Meta:
+        model = Endereco
+        fields = ['numero_casa', 'bairro', 'cep', 'complemento', 'ponto']
+        exclude = ['cod_cliente']
+
+    def clean_numero_casa(self):
+        numero = self.cleaned_data['numero_casa']
+        if numero <= 0:
+            raise forms.ValidationError('Informe um número válido')
+        return numero
+
+class EnderecoClienteModel(forms.Form):
+    '''ISSO É UTIL PARA QUANDO FOR PEGAR PK DE ALGO'''
+    pk = forms.IntegerField()
+    error_messages = {
+        'pk': {
+            'required':'Informe um endereço!'
+        }
+    }
 '''REFERENTES A ÁREA ADM'''
 class ProdutoForm(forms.ModelForm):
     class Meta:
@@ -181,21 +232,5 @@ class TaxasModel(forms.ModelForm):
             raise forms.ValidationError('Já existe um bairro com este nome no sistema')
         return data
 
-class EnderecoModel(forms.ModelForm):
-    class Meta:
-        model = Endereco
-        fields = ['numero_casa', 'bairro', 'cep', 'complemento', 'ponto']
-        exclude = ['cod_cliente']
-
-    def save(self, commit=True):
-        user = super(EnderecoModel, self).save(commit=False)
-        user.cod_cliente = username
-        if commit:
-            user.save()
-        return user
-
-class EnderecoClienteModel(forms.Form):
-    '''ISSO É UTIL PARA QUANDO FOR PEGAR PK DE ALGO'''
-    pk = forms.IntegerField()
 
 

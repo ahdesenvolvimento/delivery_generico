@@ -1,13 +1,13 @@
-{% extends 'base.html'%}
+{% extends 'base_adm.html'%}
 {% block content %}
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-6">
+    <div class="row border">
+        <div class="col-6 col-sm-6 col-md-6 col-lg-6">
             <h3>Cadastro de tipos de produtos</h3>
             <form action="" method="POST" class="form" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="row">
-                    <div class="col-6">
+                    <div class="col-6 col-sm-6 col-md-6 col-lg-6">
                         <div class="form-group">
                             {{form.tipo}}
                             {% if form.tipo.errors %}
@@ -22,18 +22,22 @@
                 <button type="submit">Salvar</button>
             </form>
         </div>
-        <div class="col-6">
+        <div class="col-6 col-sm-6 col-md-6 col-lg-6">
            <h3>Tipos de produtos cadastrados</h3>
            <table class="table table-bordered">
                 <thead> 
-                    <th>Nome</th>
+                    <tr>
+                        <th>Nome</th>
+                    </tr>
                 </thead>
                 {% for i in tipos %}
                     <tbody>
-                        <td>{{i}}</td>
-                        <td>
-                            <a href="{% url 'deletar_tipo' i.cod_tipo%}">Deletar</a>
-                        </td>
+                        <tr>
+                            <td>{{i}}</td>
+                            <td>
+                                <a href="{% url 'deletar_tipo' i.cod_tipo%}">Deletar</a>
+                            </td>
+                        </tr>
                     </tbody>
                 {% endfor %}
            </table>          

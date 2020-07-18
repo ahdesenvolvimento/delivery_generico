@@ -1,20 +1,94 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet" href="{% static 'css/normalize.css' %}">
+    <link rel="stylesheet" href="{% static 'css/estilo.css' %}">
+    <link rel="stylesheet" href="{% static 'js/bootstrap-4.4.1-dist/css/bootstrap.min.css' %}">
 </head>
 <body>
-    <form method="post" action="">
-        {% csrf_token %}
-        <input type="text" id="username" name="username" placeholder="Nome">
-        <input type="email" id="email" name="email" placeholder="Email">
-        <input type="text" id="first_name" name="first_name"placeholder="primeiro nome">
-        <input type="text" id="last_name" name="last_name" placeholder="ultimo nome">
-        <input type="password" id="password" name="password" placeholder="senhae">
-        <input type="text" id="telefone" name="telefone" placeholder="N">
+    <div class="row header">
+        <div class="col-12">
+            <h1>NOME DA EMPRESA</h1>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <form method="post" action="">
+            {% csrf_token %}
+            <div class="row cadastro">
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" class="form-control">
 
-        <button type="submit">Cadastrar</button>
-    </form>
+                        {% if form.username.errors %}
+                            <small class="text-muted">{{form.username.errors}}</small>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="email">E-mail</label>
+                        <input type="email" id="email" name="email" class="form-control">
+                        {% if form.email.errors %}
+                            <small class="text-muted">{{form.email.errors}}</small>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="first_name">Primeiro Nome</label>
+                        <input type="text" id="first_name" name="first_name" class="form-control">
+                        {% if form.first_name.errors %}
+                            <small class="text-muted">{{form.first_name.errors}}</small>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="last_name">Último nome</label>
+                        <input type="text" id="last_name" name="last_name" class="form-control">
+                        {% if form.last_name.errors %}
+                            <small class="text-muted">{{form.last_name.errors}}</small>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="form-group">
+                        <label for="password">Senha</label>
+                        <input type="password" id="password" name="password" class="form-control">
+                        {% if form.password.errors %}
+                            <small class="text-muted">{{form.password.errors}}</small>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="form-group">
+                        <label for="telefone">Telefone</label>
+                        <input type="text" id="telefone" name="telefone" class="form-control">
+                        {% if form.telefone.errors %}
+                            <small class="text-muted">{{form.telefone.errors}}</small>
+                        {% endif %}
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Cadastrar</button>
+            </div>
+        </form>
+    </div>
+    <div class="footer">
+        <center>
+            <small>
+                <span>Git - <a href="https://ahdesenvolvimento.github.io/">https://ahdesenvolvimento.github.io/</a></span>
+            </small>
+            <br>
+            <span>Desenvolvido por Antonio Henrique - 2020 &copy;</span>
+        </center>
+    </div>
+    <script src="{% static 'js/funcoes_js.js' %}"></script>
+    <script src="{% static 'js/jquery.js' %}"></script>
+    <script src="{% static 'js/bootstrap-4.4.1-dist/js/bootstrap.min.js' %}"></script>
 </body>
+
 </html>
