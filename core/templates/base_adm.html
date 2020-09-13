@@ -9,9 +9,10 @@
     <link rel="stylesheet" href="{% static 'css/normalize.css' %}">
     <link rel="stylesheet" href="{% static 'css/estilo.css' %}">
     <link rel="stylesheet" href="{% static 'js/bootstrap-4.4.1-dist/css/bootstrap.min.css' %}">
+    
 </head>
 <body>
-    <div class="row header fixed-top">
+    <div class="row header fixed-top" id='opa'>
         <div class="col-8 col-sm-8 col-md-8 col-lg-4">
             <h1><a href="{% url 'index' %}">S.O.S Burguer</a></h1>
             
@@ -25,6 +26,12 @@
                     <ul class="navbar-nav">
                         <li class="nav-item">
                             <a href="{% url 'produtos' %}" class="nav-link">Produtos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'ingredientes' %}" class="nav-link">Ingredientes</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'motoboy' %}" class="nav-link">Motoboys</a>
                         </li>
 
                         <li class="nav-item">
@@ -53,7 +60,7 @@
     </div>
     {% block content %}
     {% endblock %}
-    <div class="footer">
+    <div class="footer fixed-bottom">
         <center>
             <small>
                 <span>Git - <a href="https://ahdesenvolvimento.github.io/">https://ahdesenvolvimento.github.io/</a></span>
@@ -62,6 +69,7 @@
             <span>Desenvolvido por Antonio Henrique - 2020 &copy;</span>
         </center>
     </div>
+
     <script src="{% static 'js/funcoes_js.js' %}"></script>
     <script src="{% static 'js/jquery.js' %}"></script>
     <script src="{% static 'js/bootstrap-4.4.1-dist/js/bootstrap.min.js' %}"></script>

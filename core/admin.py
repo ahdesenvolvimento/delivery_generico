@@ -5,12 +5,12 @@ from django.contrib.auth.admin import UserAdmin
 @admin.register(Usuario)
 class UAdmin(UserAdmin):
 
-    list_display = ['email', 'telefone', 'is_staff', 'controle_pedido']
+    list_display = ['is_staff', 'controle_pedido']
 
 
 @admin.register(Produto)
 class ProdAdmin(admin.ModelAdmin):
-
+    
     list_display = ['nome', 'descricao', 'valor', 'tipo']
 
     def tipo(self, instance):

@@ -2,12 +2,11 @@
 {% load static %}
 
 {% block content %}
-    <div class="container-fluid">
+    <div class="container ajustar">
         <div class="row">
             <div class="col-12 col-sm-12 col-md-6 col-lg-6">
                 <center>
                 <h3>Carrinho</h3>
-                <p>Total: R$ </p>
                 <form method="post" action="">
                     {% csrf_token %}
                     <table class="table table-bordered">
@@ -68,8 +67,7 @@
                     </div>
 
                     {% endfor %}
-                
-            
+
                     {% if enderecos %}
                         <h5>Endereços cadastrados</h3>
                         {% if form.numero_casa.errors%}
@@ -82,7 +80,7 @@
                     {% endif %}
                         <div class="row">
                             {% for i in enderecos %}
-                                <div class="col-4 col-sm-4 col-md-4 col-lg-4 borda">
+                                <div class="col-4 col-sm-4 col-md-4 col-lg-4 border">
                                     <label for="pk">{{i.numero}}{{i.bairro}}</label>
                                     <input type="radio" id="pk" name="pk" value="{{i.cod_endereco}}">
                                     <small class="form-text text-muted">CEP: {{i.cep}}</small>
@@ -95,61 +93,59 @@
                         </div>
                     {% else %}
                         <p>Sem endereços salvos</p>
-                        <button data-toggle="modal" data-target="#modal_endereco">Adicionar endereço</button>
+                        <button data-toggle="modal" class="btn btn-primary" type="button" data-target="#modal_endereco">Adicionar endereço</button>
                     {% endif %}
                 </form>
             </div>
-    
-            <div class="modal fade" id="modal_endereco">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h6 class="modal-title">Endereço</h6>
-                            <button type="button" data-dismiss="modal" class="close">&times;</button>
-                        </div>
-                        <form action="" method="POST">
-                            {% csrf_token %}
-                            <div class="modal-body">                           
-                                <div class="form-group">
-                                    <label for="numero_casa">Nº</label>
-                                    <input name="numero_casa" id="numero_casa" type="number" class="form-control">
-                                    {% if form.numero_casa.errors%}
-                                        {{form.numero_casa.errors}}
-                                    {% endif %}
-                                </div>
-                        
-                                <div class="form-group">
-                                    <select id="bairro" name="bairro" class="form-control">
-                                        {% for i in taxas %}
-                                            <option value="{{i.cod_bairro}}">{{i.nome}}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                                
-                                <div class="form-group">
-                                    <label for="cep">CEP</label>
-                                    <input name="cep" id="cep" type="text" maxlength="50" class="form-control">
-                                </div>
-                                                        
-                                <div class="form-group">
-                                    <label for="complemento">Complemento</label>
-                                    <input name="complemento" id="complemento" type="text" maxlength="100" class="form-control">
-                                </div>
-                                                
-                                <div class="form-group">
-                                    <label for="ponto">Ponto de referência</label>
-                                    <input name="ponto" id="ponto" type="text" maxlength="50" class="form-control">
-                                </div>                          
-                            </div>
-
-                            <div class="modal-footer">
-                                <button type="submit">Salvar</button>
-                            </div>
-                        </form>
-                    </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modal_endereco" data-toggle="modal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title">Endereço</h6>
+                    <button type="button" data-dismiss="modal" class="close">&times;</button>
                 </div>
-            </div>
+                <form action="" method="POST">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="numero_casa">Nº</label>
+                            <input name="numero_casa" id="numero_casa" type="number" class="form-control">
+                            {% if form.numero_casa.errors%}
+                                {{form.numero_casa.errors}}
+                            {% endif %}
+                        </div>
 
+                        <div class="form-group">
+                            <select id="bairro" name="bairro" class="form-control">
+                                {% for i in taxas %}
+                                    <option value="{{i.cod_bairro}}">{{i.nome}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cep">CEP</label>
+                            <input name="cep" id="cep" type="text" maxlength="50" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="complemento">Complemento</label>
+                            <input name="complemento" id="complemento" type="text" maxlength="100" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="ponto">Ponto de referência</label>
+                            <input name="ponto" id="ponto" type="text" maxlength="50" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit">Salvar</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 

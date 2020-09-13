@@ -2,17 +2,13 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from .models import Pedido, Produto, Usuario, FormaPagamento, Carrinho, Tipo, Bairro, Endereco
+from .models import Pedido, Produto, Usuario, FormaPagamento, Carrinho, Tipo, Bairro, Endereco,  MotoBoy, \
+    Adicionais #,Promocao,
 
 class UserModelForm(forms.ModelForm):
     class Meta:
         model = Usuario
-        fields = ['username', 'first_name', 'last_name', 'password', 'email', 'telefone']
-        error_messages = {
-            'telefone': {
-                'required': 'Campo obrigatório, informe o seu DDD'
-            }
-        }
+        fields = ['username', 'first_name', 'last_name', 'password']
 
     def clean_username(self):
         nome = self.cleaned_data['username']
@@ -35,13 +31,6 @@ class UserModelForm(forms.ModelForm):
             raise forms.ValidationError('Informe um numero de telefone válido!')
         return telefone
 
-    def clean_email(self):
-        email = self.cleaned_data['email']
-        existe = Usuario.objects.filter(email=email)
-        if existe:
-            raise forms.ValidationError('Este email já está sendo utilizado!')
-
-        return email
     def save(self, commit=True):
         user = super(UserModelForm, self).save(commit=False)
         user.set_password(self.cleaned_data['password'])
@@ -111,6 +100,11 @@ class EnderecoClienteModel(forms.Form):
             'required':'Informe um endereço!'
         }
     }
+
+class AdicionaisModelCliente(forms.Form):
+    pk_ad = forms.IntegerField()
+
+
 '''REFERENTES A ÁREA ADM'''
 class ProdutoForm(forms.ModelForm):
     class Meta:
@@ -167,7 +161,8 @@ class TipoProdutos(forms.ModelForm):
     def clean_tipo(self):
         data = self.cleaned_data['tipo']
         dados = Tipo.objects.filter(tipo=data)
-        if data:
+        print(dados)
+        if dados:
             raise forms.ValidationError('Este tipo de produto já está cadastrado no sistema')
         return data
 
@@ -228,9 +223,53 @@ class TaxasModel(forms.ModelForm):
     def clean_nome(self):
         data = self.cleaned_data['nome']
         dados = Bairro.objects.filter(nome=data)
-        if data:
+        if dados:
             raise forms.ValidationError('Já existe um bairro com este nome no sistema')
         return data
 
+class AtualizaTaxa(forms.ModelForm):
+    class Meta:
+        model = Bairro
+        fields = ['taxa']
+        exclude = ['nome']
 
+class MotoBoyModel(forms.ModelForm):
+    class Meta:
+        model = MotoBoy
+        fields = '__all__'
 
+class MotoBoyPk(forms.Form):
+    pk_moto = forms.IntegerField()
+
+class IngredientePk(forms.Form):
+    pk_ing = forms.CheckboxSelectMultiple()
+
+class AdicionaisModel(forms.ModelForm):
+    class Meta:
+        model = Adicionais
+        fields = '__all__'
+
+'''
+class PromocaoModel(forms.ModelForm):
+    class Meta:
+        model = Promocao
+        fields = '__all__'
+
+    def clean_produto(self):
+        data = self.cleaned_data['produto']
+        existe = Promocao.objects.filter(produto=data)
+        if existe:
+            raise forms.ValidationError('Já cadastrado!')
+        return data
+'''
+
+#{ %
+#for ingrediente in ingredientes %}
+#< label
+#for ="pk_ing" > {{ingrediente.nome}} < / label >
+#< input
+#type = "checkbox"
+#name = "pk_ing"
+#id = "pk_ing"
+#value = "{{ingrediente.nome}}" >
+#{ % endfor %}

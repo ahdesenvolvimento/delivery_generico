@@ -2,7 +2,7 @@
 {% load static %}
 {% block content %}
 
-<div class="container-fluid">
+<div class="container ajustar">
     <div class="row border">
         <div class="col-6 col-sm-6 col-md-6 col-lg-6">
             <h3>Cadastro de produtos</h3>
@@ -81,6 +81,21 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="row">
+                    <div class="col-6 col-sm-6 col-md-6 col-lg-6">
+                        <div class="form-group">
+                            <label for="tem_adicional">Tem adicional?</label>
+                            <select id="tem_adicional" name="tem_adicional" class="form-control">
+                                <option>Selecione uma opção</option>
+                                <option value="true">Sim</option>
+                                <option value="false">Não</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                
                     
                 <button type="submit" class="btn btn-success">Salvar</button>
                 
@@ -98,10 +113,9 @@
                 {% for i in produtos %}
                     <tbody>
                         <tr>
-                            <td>{{i}}</td>
-                            <td>
-                                <a href="{% url 'deletar_produto' i.cod_prod %}">Deletar</a>
-                            </td>
+                            <td><a href="{% url 'atualiza_produto' i.cod_prod %}">{{i}}</a></td>
+                            <td><a href="{% url 'deletar_produto' i.cod_prod %}">Deletar</a></td>
+                            <td><a href="{% url 'deletar_produto' i.cod_prod %}">{{i.ativo}}</a></td>
                         </tr>
                     </tbody>
                 {% endfor %}

@@ -1,0 +1,88 @@
+{% extends 'base_adm.html' %}
+{% block content %}
+<div class="container ajustar">
+
+    <div class="row border">
+        <div class="col-6 col-sm-6 col-md-6 col-lg-6">
+            <h3>Cadastro de promoções</h3>
+            <form action="" method="POST" class="form">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-6 col-sm-6 col-md-6 col-lg-6">
+                        <div class="form-group">
+                            <label for="nome">Nome do produto</label>
+                            <select name="produto" id="produto" class="form-control">
+                            {% for i in produtos %}
+                                <option value="{{i.cod_prod}}">{{i.nome}}</option>
+                            {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6 col-sm-6 col-md-6 col-lg-6">
+                        <div class="form-group">
+                            <label for="novo_preco">Novo preço</label>
+                            <input type="number" name="novo_preco" id="novo_preco" class="form-control">
+                        
+                        </div>
+                    </div>
+                </div>
+            
+                <div class="row">
+                    <div class="col-6 col-sm-6 col-md-6 col-lg-6">
+                        <div class="form-group">
+                            <label for="dia_promo">Dia da promoção</label>
+                            <input type="text" name="dia_promo" id="dia_promo" class="form-control">
+                            {% if form.valor.errors %}
+                                {% for error in form.valor.errors %}
+                                    <small class="form-text text-muted">{{error}}</small>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6 col-sm-6 col-md-6 col-lg-6">
+                        <div class="form-group">
+                            <label for="ativo">Ativar promoção</label>
+                            <select name="ativo" required id="ativo" class="form-control">
+                                <option value="true">Sim</option>
+                                <option value="false">Não</option>
+                            
+                            </select>
+                        </div>
+                    </div>
+                </div>
+    
+                <button type="submit" class="btn btn-success">Salvar</button>
+                
+            </form>
+        </div>
+        <div class="col-6 col-sm-6 col-md-6 col-lg-6">
+            <h3>Produtos cadastrados</h3>
+            <table class="table table-bordered">
+                 <thead>
+                     <tr>
+                         <th>Produto</th>
+                         <th>Dia</th>
+                         <th>Ativo</th>
+                     </tr>
+                 </thead>
+                 {% for i in promocoes %}
+                     <tbody>
+                         <tr>
+                             <td><a href="{% url 'atualiza_promocao' i.cod_promo %}">{{i.produto.nome}}</a></td>
+                             <td><a href="#">{{i.dia_promo}}</a></td>
+                             <td><a href="#">{{i.ativo}}</a></td>
+                             <td><a href="{% url 'deletar_promocao' i.cod_promo%}">Deletar</a></td>
+                             
+                         </tr>
+                     </tbody>
+                 {% endfor %}
+ 
+            </table>
+            
+         </div>
+    </div>
+{% endblock %}

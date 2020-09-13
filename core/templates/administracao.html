@@ -1,6 +1,6 @@
 {% extends 'base_adm.html' %}
 {% block content %}
-<div class="container-fluid index">
+<div class="container ajustar">
     <h4>Bem vindo a administração do sistema</h4>
     <button>Listar apenas não entregues</button>
     <button>Listar todos os pedidos</button>
@@ -26,11 +26,34 @@
                 <div class="col-3">
                     <button type="submit" class="btn btn-primary">Salvar</button>
                 </div>
+
+                 <div class="form-group col-6">
+                    <select id="pk_moto" name="pk_moto" class="form-control">
+                        <option value="">Selecione um motoboy</option>
+                        {% for i in motoboys %}
+                            <option value="{{i.cod_moto}}">{{i.nome}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-3">
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
                 <div class="col-12">
                     <strong>Dados do pedido</strong>
                     {% for j in produtos %}
                         {% if i.cod_pedido == j.cod_pedido.cod_pedido %}
                             <p>Item pedido {{i.cod_pedido}}: {{j.cod_prod.nome}}</p>
+                            <h6>Adicionais</h6>
+                            
+                            {% for adicional in adicionais %}
+                                {% if adicional.cod_carrinho.cod_pedido.cod_pedido == j.cod_pedido.cod_pedido %}
+                                    <p>{{adicional.molho}}</p>
+                                    <p>{{adicional.molho_adicional}}</p>
+                                    <p>{{adicional.adicional_um}}</p>
+                                    <p>{{adicional.adicional_dois}}</p>
+                                    <p>{{adicional.pao}}</p>
+                                {% endif %}
+                            {% endfor %}
                             <p>Qtd: {{j.quantidade}}</p>
                         {% endif %}
                     {% endfor %}
@@ -50,7 +73,8 @@
                 </div>
                 <div class="col-12">
                     <p><strong>Valor total: R$ {{i.total}}</strong></p>
-                    <p><strong>Valor entregador: R$ {{i.cod_endereco.cod_endereco.bairro.taxa}}</strong></p>
+                    <p><strong>Valor entregador({{i.cod_motoboy.nome}}): R$ {{i.cod_endereco.cod_endereco.bairro.taxa}}</strong></p>
+
                     
                 </div>
                 

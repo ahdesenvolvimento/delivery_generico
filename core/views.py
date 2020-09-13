@@ -2,11 +2,13 @@ from django.shortcuts import render, redirect, get_object_or_404
 #from .models import Usuarios
 from datetime import date
 
-from .models import Tipo, Produto, Pedido, Carrinho, FormaPagamento, Bairro, Usuario, EnderecoCliente, Endereco
+from .models import Tipo, Produto, Pedido, Carrinho, FormaPagamento, Bairro, Usuario, EnderecoCliente, Endereco, \
+    MotoBoy, Adicionais #,Promocao
 from .forms import UserModelForm, ProdutoModelForm,\
     PagamentoModelForm, CarrinhoModelForm, AtualizaPedido,\
     ProdutoForm, TipoProdutos, FormaPagamentoModel, TaxasModel, \
-    EnderecoModel, EnderecoClienteModel
+    EnderecoModel, EnderecoClienteModel, IngredientePk, \
+    MotoBoyModel, MotoBoyPk, AtualizaTaxa, AdicionaisModel, AdicionaisModelCliente
 
 from django.db import connection
 from django.core.exceptions import ObjectDoesNotExist
@@ -15,26 +17,23 @@ from django.db.models import Sum
 
 def index(request):
     if request.user.is_staff:
-
-        return redirect('administracao')#, {'pedidos':pedidos,
-                                              #'produtos':produtos})
-
+        return redirect('administracao')
     else:
         if str(request.method == 'POST'):
             tipo = Tipo.objects.all()
-            produtos = Produto.objects.all()
-            print('começo')
+
+            produtos = Produto.objects.filter(ativo=True)
+            adicionais = Adicionais.objects.filter(ativo=True)
+
             form_produto = ProdutoModelForm(request.POST)
             form_carrinho = CarrinhoModelForm(request.POST)
-            if form_carrinho.is_valid():
-                print('12312ij312o')
-            else:
-                print('ta invalido')
             if form_produto.is_valid() and form_carrinho.is_valid():
                 print('formulario')
                 dados_prod = form_produto.cleaned_data
                 dados_carrinho = form_carrinho.cleaned_data
+                print(dados_carrinho)
                 prod = Produto.objects.get(nome=dados_prod['nome'])
+
                 try:
                     print('try')
                     carro = Carrinho.objects.get(cod_cliente=request.user.id,
@@ -58,13 +57,11 @@ def index(request):
                                                                 cod_prod__nome=dados_prod['nome']).update(quantidade=quantidade,
                                                                                                           total=total,
                                                                                                           observacao=dados_carrinho['observacao'])
-
                     #else:
                       #  inserir = Carrinho.objects.create(cod_pseudo_pedido=variavel,
                          #                                 cod_prod=prod,
                            #                               quantidade=dados_quantidade['quantidade'],
                             #                              total=prod.valor * dados_quantidade['quantidade'])
-
                 except ObjectDoesNotExist:
                     print('entrei aqui except')
                     total = prod.valor * dados_carrinho['quantidade']
@@ -74,20 +71,23 @@ def index(request):
                                                        cod_cliente=request.user,
                                                        total=total,
                                                        observacao=dados_carrinho['observacao'])
+
                     usuario = Usuario.objects.filter(id=request.user.id).update(controle_pedido=True)
                     carrinho.save()
+
 
             else:
                 print('form invalido')
             carrinho = Carrinho.objects.filter(cod_cliente=request.user.id,
                                                cod_pedido=None)
 
-            print(carrinho)
+           # print(carrinho)
             return render(request,
                           'index.html',
                           {'tipo':tipo,
                            'produtos':produtos,
-                           'carrinho':carrinho})
+                           'carrinho':carrinho})#,
+                          # 'x':pk_ing})
                         #    form_carrinho
                           #  ':form_carrinho})
                           # 'base':variavel})
@@ -145,6 +145,7 @@ def finalizar(request):
                                                     cod_cliente__controle_pedido=True).update(cod_pedido=pedido)
         atualiza_usuario = Usuario.objects.filter(id=request.user.id,
                                                   controle_pedido=True).update(controle_pedido=False)
+        #atualiza_adicional = Adicionais.objects.filter(cod_carrinho__cod_cliente=request.user).update(cod_pedido=pedido)
         return redirect('index')
 
         #print(total['total__sum'] + total2.bairro.taxa)
@@ -215,15 +216,15 @@ def deletar_produto_carrinho_index(request, pk):
                                        cod_cliente__controle_pedido=True)
     return redirect('index')
 
-
-
 '''Funções da área ADM'''
 
 def administracao(request):
     data_atual = date.today()
     pedidos = Pedido.objects.all().filter(modificacao=data_atual).order_by('-cod_pedido')
-
+    pk_moto = MotoBoyPk(request.POST or None)
+    motoboy = MotoBoy.objects.all()
     produtos = Carrinho.objects.all()
+    adicionais = Adicionais.objects.all()
     # with connection.cursor() as cursor:
     #   cursor.execute(
     #     'SELECT USERNAME, COD_PEDIDO, STATUS, NOME FROM CORE_PEDIDO INNER JOIN CORE_BASEPEDIDO ON COD_CARRINHO_ID = COD_BASE INNER JOIN CORE_CARRINHO ON COD_PSEUDO_PEDIDO_ID = COD_BASE INNER JOIN CORE_PRODUTO ON COD_PROD_ID = COD_PROD INNER JOIN CORE_USUARIO ON COD_CLIENTE_ID = ID'
@@ -232,14 +233,23 @@ def administracao(request):
     # print(pedidos[0])
 
     form = AtualizaPedido(request.POST or None)
+    if pk_moto.is_valid():
+        dados_moto = pk_moto.cleaned_data
+        moto = MotoBoy.objects.get(cod_moto=dados_moto['pk_moto'])
+        pedido = Pedido.objects.filter(cod_pedido=request.POST.get('cod_pedido')).update(cod_motoboy=moto)
 
-    if form.is_valid():  # and form2.is_valid():
+
+    if form.is_valid():## and pk_moto.is_valid():  # and form2.is_valid():
+       #
         pedido = Pedido.objects.filter(cod_pedido=request.POST.get('cod_pedido')).update(
-            status=form.cleaned_data['status'])
+            status=form.cleaned_data['status'])#, cod_motoboy=moto)
     else:
         print('haha')
     return render(request, 'administracao.html', {'pedidos':pedidos,
-                                                 'produtos':produtos})
+                                                  'produtos':produtos,
+                                                  'motoboys':motoboy,
+                                                  'adicionais':adicionais})
+
 def produtos(request):
     print("21312321", request.FILES)
     form = ProdutoForm(request.POST, request.FILES)
@@ -298,3 +308,86 @@ def deletar_taxa(request, pk):
     taxa.delete()
 
     return redirect('taxas')
+
+def ingredientes(request):
+    ing = IngredientesModel(request.POST or None)
+    x = Ingredientes.objects.all()
+    if ing.is_valid():
+        print('deu certo')
+        ing.save()
+    return render(request, 'ingredientes.html', {'form':ing, 'x':x})
+
+def motoboy(request):
+    moto = MotoBoyModel(request.POST or None)
+    motos = MotoBoy.objects.all()
+    if moto.is_valid():
+        moto.save()
+    return render(request, 'motoboy.html', {'form':moto, 'x':motos})
+'''
+
+def promocao(request):
+    promo = PromocaoModel(request.POST or None)
+    promocoes = Promocao.objects.all()
+    produtos = Produto.objects.filter(ativo=True)
+    if promo.is_valid():
+        dados = promo.cleaned_data['produto']
+
+        produto = Produto.objects.filter(nome=dados).update(ativo=False)
+        print(produto)
+        print(dados)
+        promo.save()
+    return render(request, 'promocao.html', {'form':promo, 'promocoes':promocoes, 'produtos':produtos})
+'''
+
+def atualiza_produto(request, pk):
+    produto = Produto.objects.get(cod_prod=pk)
+    prod = ProdutoForm(request.POST or None, instance=produto)
+    if prod.is_valid():
+        prod.save()
+        return redirect('produtos')
+    return render(request, 'produto.html', {'produto':produto, 'form':prod})
+
+def atualiza_bairro(request, pk):
+    bairro = Bairro.objects.get(cod_bairro=pk)
+    taxa = AtualizaTaxa(request.POST or None, instance=bairro)
+    if taxa.is_valid():
+        taxa.save()
+        return redirect('taxas')
+    return render(request, 'atualiza_bairro.html', {'bairro':bairro, 'form':taxa})
+
+'''
+def atualiza_promocao(request, pk):
+    promocao = Promocao.objects.get(cod_promo=pk)
+    promo = PromocaoModel(request.POST or None, instance=promocao)
+    if promo.is_valid():
+        dados = promo.cleaned_data
+        if dados['ativo'] is True:
+            produto = Produto.objects.filter(nome=dados['produto']).update(ativo=False)
+        else:
+            produto = Produto.objects.filter(nome=dados['produto']).update(ativo=True)
+        print("dADOS", dados)
+        promo.save()
+        return redirect('promocao')
+    return render(request, 'atualiza_promocao.html', {'form':promo})
+
+def deletar_promocao(request, pk):
+    promo = Promocao.objects.get(cod_promo=pk)
+    print(promo.ativo)
+    if promo.ativo is True:
+        print('entrie aqui')
+        promocao = Promocao.objects.filter(cod_promo=pk).update(ativo=False)
+        produto = Produto.objects.filter(nome=promo.produto).update(ativo=True)
+        promo = Promocao.objects.filter(cod_promo=pk)
+        promo.delete()
+    else:
+        promo = Promocao.objects.filter(cod_promo=pk)
+        promo.delete()
+
+    return redirect('promocao')
+'''
+def adicionais(request):
+    adicional = AdicionaisModel(request.POST)
+    ad = Adicionais.objects.all()
+    if adicional.is_valid():
+        adicional.save()
+    return render(request, 'adicionais.html', {'form':adicional, 'adicional':ad})

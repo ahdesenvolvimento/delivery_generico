@@ -2,143 +2,96 @@
 {% load static %}
 
 {% block content %}
-    
-    <div class="container-fluid index">
-        <div class="row apresentacao">
-            <div class="col-12 col-sm-12 col-md-12 col-lg-12">
-                <h6>Bem vindo <strong>{{user.username}}</strong>, fique a vontade para escolher seu pedido</h6>
+
+    <div class="container">
+        <div class="row apresentacao border-top border-bottom">
+            <div class="col-12">
+                <h3>Bem vindo ao S.O.S Burguer</h3>
             </div>
-            <div class="col-12 col-sm-12 col-md-12 col-lg-12">
-                {% if carrinho %}
-                    <a class="btn btn-primary" href="{% url 'finalizar' %}" type="button">Finalizar pedido</a>
+            <div class="col-12">
+                <h6>Fique a vontade para escolher seu pedido</h5>
+                    {% if carrinho %}
+                        <a href="{% url 'finalizar' %}" class="btn btn-primary" ">Finalizar</a>
+                    {% endif %}
+
+            </div>
+        </div>
+        <div class="row promocoes border-bottom">
+            <div class="col-12">
+                {% if promocoes %}
+                <h4>Promocoes do dia</h4>
+                    {% for i in promocoes %}
+                        <div class="col-4">
+                            {{i.produto}}
+                            {{i.dia_promo}}
+                            {{i.novo_preco}}
+                            <strike>{{i.produto.valor}}</strike>
+                            <img src="{{i.produto.imagem.url}}" alt="" width=25%>
+                        </div>
+                    {% endfor %}
                 {% endif %}
             </div>
         </div>
-        <div class="row">
-            <div class="col-6 col-sm-6 col-md-6 col-lg-6">
-                {% for tip in tipo %}
-                    <div class="titulos">
-                        <h4 class="nome-alimento">{{tip}}</h4>
-                    </div>
-                    <center>
-                        <div class="row">
-                            {% for i in produtos %}
-                                {% if i.cod_tipo.tipo == tip.tipo %}
-                                    <div class="modal fade" id="modal{{i.cod_prod}}" data-toggle="modal">
-                                        <div class="modal-dialog" role="document">
-                                            <div class="modal-content">
-                                                <form method="post" action="">
-                                                    {% csrf_token %}
-                                                    <div class="modal-header">
-                                                        <input class="modal-title" placeholder="{{i.nome}}" value="{{i.nome}}" id="nome" name="nome" type="text" style="width:600px;">
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="col-12">
-                                                            <img src="{{i.imagem.url}}" alt="" width="50%">
-                                                        </div>
-                                                        <div class="col-6">
-                                                            {{i.ingredientes}}
-                                                        </div>
-                                                        <div class="col-6">
-                                                            {{i.descricao}}
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        {% if request.user.is_anonymous %}
-                                                            <small>Você precisa está logado para adicionar o item ao carrinho</small>
-                                                            <a class="btn btn-secondary" href="{% url 'login' %}">Logar</a>
-                                                        {% else %}
-                                                            <input type="number" id="quantidade" name="quantidade" value="1">
-                                                            <textarea cols="20" rows="2" name="observacao" id="observacao" placeholder="Observações"></textarea>
-                                                            <button class="btn btn-secondary" type="submit">Adicionar +R$ {{i.valor}}</button>
-                                                        {% endif %}
-                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Sair</button>
-                                                    </div>
-                                                </form>
-                                            </div>
+        <div class="row produtos">
+            <div class="col-12">
+                {% for i in tipo %}
+                <div class="titulos">
+                    <h5>{{i}}</h5>
+                </div>
+                <div class="row">
+                    {% for produto in produtos %}
+                        {% if produto.cod_tipo.tipo == i.tipo %}
+                        <div class="modal fade" id="modal{{produto.cod_prod}}" data-toggle="mod">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <form method="post" action="">
+                                        {% csrf_token %}
+                                        <div class="modal-header">
+                                            <input class="modal-title" placeholder="{{produto.nome}}" value="{{produto.nome}}" id="nome" name="nome" type="text" style="width:600px;">
                                         </div>
-                                    </div>
-                                    <div class="col-12 col-sm-12 col-md-4 col-lg-4 produto" data-target="#modal{{i.cod_prod}}" data-toggle="modal">
-                                        <img src="{{i.imagem.url}}" alt="" width="75%">
-                                        <p>{{i}}</p>
-                                        <p><strong>R$: {{i.valor}}</strong></p>
-                                    </div>
-                                {% endif %}
-                            {% endfor %}
+                                        <div class="modal-body">
+                                            <div class="col-12">
+                                                <img src="{{produto.imagem.url}}" alt="" width="50%">
+                                            </div>
+                                            <div class="col-6">
+                                                {{produto.ingredientes}}
+                                            </div>
+                                            <div class="col-6">
+                                                {{produto.descricao}}
+                                            </div>
+                                            <div class="col-6">
+                                                <h3>Adicionais</h3>
+
+
+                                            </div>
+
+                                        </div>
+                                        <div class="modal-footer">
+                                            {% if request.user.is_anonymous %}
+                                                <small>Você precisa está logado para adicionar o item ao carrinho</small>
+                                                <a class="btn btn-secondary" href="{% url 'login' %}">Logar</a>
+                                            {% else %}
+                                                <input type="number" id="quantidade" name="quantidade" value="1">
+                                                <textarea cols="20" rows="2" name="observacao" id="observacao" placeholder="Observações"></textarea>
+                                                <button class="btn btn-secondary" type="submit">Adicionar +R$ {{produto.valor}}</button>
+                                            {% endif %}
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Sair</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
-                    </center>
+                        <div class="col-4 produto">
+                            <img src="{{produto.imagem.url}}" alt="" width="25%" data-target="#modal{{produto.cod_prod}}" data-toggle="modal">
+                            <p>{{produto.nome}}</p>
+                            <p>{{produto.valor}}</p>
+
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
                 {% endfor %}
             </div>
-            
-            <div class="col-12 col-sm-12 col-md-6 col-lg-6 carrinho">
-                <h4>Carrinho</h4>
-                
-                {% if carrinho %}
-                    
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Produto</th>
-                                <th>Qtd</th>
-                                <th>OBS</th>
-                                <th>Valor (R$)</th>
-                
-                            </tr>
-                        </thead>
-                        {% for i in carrinho %}
-                            <tbody>
-                                <tr>
-                                    <td>{{i.cod_prod}}</td>
-                                    <td>{{i.quantidade}}</td>
-                                    {% if i.observacao %}
-                                        <td>{{i.observacao}}</td>
-                                    {% else %}
-                                        <td>Sem OBS</td>
-                                    {% endif %}
-                                    <td>{{i.cod_prod.valor}}</td>
-                                    <td><a href="{% url 'deletar_produto_carrinho_index' i.cod_prod.cod_prod %}">Remover</a></td>
-                                </tr>
-                            </tbody>
-                        {% endfor %}
-                        <tfoot>
-                            <tr>
-                                <th>Total</th>
-                                <td></td>
-                                <td></td>
-                                <td>5000</td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                {% else %}
-                    <p>Carrinho vazio :)</p>
-                {% endif %}   
-            </div>
-            
         </div>
     </div>
-    {% if carrinho %}
-        <div class="modal fade" data-toggle="modal" id="modal_carrinho">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h6 class="modal-title">Carrinho</h6>
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        {% for i in carrinho %}
-                            <div class="col-12">
-                                <p>{{i.cod_prod}} x{{i.quantidade}} = R$ {{i.total}}</p>
-                            </div>
-                            <div class="col-12">
-                                <p></p>
-                            </div>
-                        {% endfor %}
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" data-dismiss="modal">Sair</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    {% endif %}
- {% endblock %}
+{% endblock %}
